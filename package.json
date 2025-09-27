@@ -18,6 +18,8 @@
     "etl:build": "node scripts/etl/buildRecipes.js",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "clean": "rm -rf dist coverage playwright-report test-results",
+    "clean:all": "rm -rf dist coverage playwright-report test-results node_modules/.vite",
     "prepare": "husky"
   },
   "dependencies": {
