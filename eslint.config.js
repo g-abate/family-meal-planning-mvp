@@ -12,6 +12,7 @@ export default [
       'coverage',
       'playwright-report',
       'test-results',
+      'tests/e2e/**',
     ],
   },
   js.configs.recommended,

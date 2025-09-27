@@ -117,7 +117,7 @@
   - [ ] 1.4 Configure Tailwind CSS with responsive design utilities
   - [ ] 1.5 Set up Vitest for unit testing with React Testing Library
   - [ ] 1.6 Configure Playwright for E2E testing
-  - [ ] 1.7 Set up Vite PWA plugin with Workbox configuration
+  - [x] 1.7 Set up Vite PWA plugin with Workbox configuration
 
 - [ ] 2.0 Database Infrastructure and ETL Pipeline
   - [ ] 2.1 Create SQLite schema with recipes table and FTS5 virtual table
