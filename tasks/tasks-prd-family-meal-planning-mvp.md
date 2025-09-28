@@ -119,22 +119,22 @@
   - [x] 1.6 Configure Playwright for E2E testing
   - [x] 1.7 Set up Vite PWA plugin with Workbox configuration
 
-- [ ] 2.0 Database Infrastructure and ETL Pipeline
-  - [ ] 2.1 Create SQLite schema with recipes table and FTS5 virtual table
-  - [ ] 2.2 Set up SQLite WASM with Web Worker for non-blocking operations
+- [x] 2.0 Database Infrastructure and ETL Pipeline
+  - [x] 2.1 Create SQLite schema with recipes table and FTS5 virtual table
+  - [x] 2.2 Set up SQLite WASM with Web Worker for non-blocking operations
   - [ ] 2.3 Implement OPFS (Origin Private File System) for database storage (Phase 2 - optional)
-  - [ ] 2.4 Create Node.js ETL pipeline with better-sqlite3 for recipe processing
-  - [ ] 2.5 Build Zod schemas for recipe validation in ETL pipeline
-  - [ ] 2.6 Generate FTS5 index for full-text recipe search
-  - [ ] 2.7 Create build script to generate versioned recipes.sqlite
-  - [ ] 2.8 Set up Dexie store for meal plans and user preferences
+  - [x] 2.4 Create Node.js ETL pipeline with better-sqlite3 for recipe processing
+  - [x] 2.5 Build Zod schemas for recipe validation in ETL pipeline
+  - [x] 2.6 Generate FTS5 index for full-text recipe search
+  - [x] 2.7 Create build script to generate versioned recipes.sqlite
+  - [x] 2.8 Set up Dexie store for meal plans and user preferences
 
-- [ ] 3.0 Type Definitions and Schemas
-  - [ ] 3.1 Define TypeScript interfaces for recipe data structures
-  - [ ] 3.2 Create meal planning types (plans, preferences, prep sessions)
-  - [ ] 3.3 Define database operation interfaces for SQLite WASM
-  - [ ] 3.4 Create Zod schemas for form validation (ingredients, dietary tags, prep settings)
-  - [ ] 3.5 Set up type-safe database queries with proper error handling
+- [x] 3.0 Type Definitions and Schemas
+  - [x] 3.1 Define TypeScript interfaces for recipe data structures
+  - [x] 3.2 Create meal planning types (plans, preferences, prep sessions)
+  - [x] 3.3 Define database operation interfaces for SQLite WASM
+  - [x] 3.4 Create Zod schemas for form validation (ingredients, dietary tags, prep settings)
+  - [x] 3.5 Set up type-safe database queries with proper error handling
 
 - [ ] 4.0 Recipe Service and Meal Planning Engine
   - [ ] 4.1 Implement SQLite WASM service layer with Web Worker communication
