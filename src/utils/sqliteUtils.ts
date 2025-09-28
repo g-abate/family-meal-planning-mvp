@@ -2,7 +2,7 @@
 // Provides helper functions for database operations
 // Version: 1.0
 
-import type { DatabaseResult, QueryOptions, SearchOptions } from '../types/database';
+import type { DatabaseResult, SearchOptions } from '../types/database';
 
 // Database initialization utilities
 export const DATABASE_VERSION = '1.0';
@@ -271,7 +271,7 @@ export function isSchemaCompatible(currentVersion: string, requiredVersion: stri
 }
 
 // Error handling utilities
-export function handleDatabaseError(error: any): DatabaseResult {
+export function handleDatabaseError(error: unknown): DatabaseResult {
   let code = 'DATABASE_ERROR';
   let message = 'An unknown database error occurred';
 
@@ -320,8 +320,9 @@ export class DatabasePerformanceMonitor {
     };
   }
 
-  logSlowQuery(duration: number, threshold: number = 100): void {
+  logSlowQuery(duration: number, threshold = 100): void {
     if (duration > threshold) {
+      // eslint-disable-next-line no-console
       console.warn(`Slow database query detected: ${this.operationName} took ${duration}ms`);
     }
   }

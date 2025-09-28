@@ -42,16 +42,53 @@ This feature creates a normalized dataset of at least 1000 recipes using only pu
 2.5. The system must handle text encoding issues and special characters properly
 
 ### 3. Data Normalization
-3.1. The system must transform all recipes into the standardized schema:
+3.1. The system must transform all recipes into the standardized schema matching the existing database structure:
    ```json
    {
-     "title": "String",
-     "ingredients": ["List of ingredient strings"],
-     "steps": ["List of step instructions"],
-     "tags": {
-       "diet": ["vegetarian", "vegan", "pescatarian", "omnivore"],
-       "cuisine": "String (if available)",
-       "source": "usda | wikibooks | openfoodfacts",
+     "title": "String (max 100 chars)",
+     "description": "String (max 500 chars, optional)",
+     "prep_time": "Number (minutes, optional)",
+     "cook_time": "Number (minutes, optional)", 
+     "total_time": "Number (minutes, calculated)",
+     "servings": "Number (1-20, default 1)",
+     "difficulty": "String (easy | medium | hard, default easy)",
+     "image_url": "String (URL, optional)",
+     "source_url": "String (URL, optional)",
+     "calories_per_serving": "Number (optional)",
+     "protein_per_serving": "Number (grams, optional)",
+     "carbs_per_serving": "Number (grams, optional)",
+     "fat_per_serving": "Number (grams, optional)",
+     "is_featured": "Boolean (default false)",
+     "is_active": "Boolean (default true)",
+     "ingredients": [
+       {
+         "ingredient_name": "String (max 100 chars)",
+         "quantity": "Number (optional)",
+         "unit": "String (max 20 chars, optional)",
+         "notes": "String (max 200 chars, optional)",
+         "is_optional": "Boolean (default false)",
+         "sort_order": "Number (default 0)",
+         "kind": "String (protein_main | protein_source | vegetable | grain | dairy | fat | spice | other)"
+       }
+     ],
+     "instructions": [
+       {
+         "step_number": "Number (min 1)",
+         "instruction": "String (max 500 chars)",
+         "prep_time": "Number (minutes, optional)",
+         "cook_time": "Number (minutes, optional)",
+         "temperature": "Number (degrees F, optional)",
+         "notes": "String (max 200 chars, optional)"
+       }
+     ],
+     "tags": [
+       {
+         "tag_name": "String (max 50 chars)",
+         "tag_type": "String (dietary | category | cuisine | cooking_method)"
+       }
+     ],
+     "metadata": {
+       "source": "String (usda | wikibooks | openfoodfacts)",
        "license": "String (public_domain | cc_by | cc_by_sa)",
        "attribution": "String (source attribution)"
      }
@@ -66,15 +103,19 @@ This feature creates a normalized dataset of at least 1000 recipes using only pu
 4.5. The system must filter out broken or incomplete entries
 
 ### 5. Dietary Classification
-5.1. The system must automatically classify recipes as vegetarian, vegan, pescatarian, or omnivore based on ingredient analysis
-5.2. The system must use ingredient heuristics to detect meat, dairy, eggs, and fish products
+5.1. The system must automatically classify recipes using the existing dietary tag system: vegetarian, vegan, pescatarian, gluten-free, dairy-free, keto, paleo
+5.2. The system must use ingredient heuristics to detect meat, dairy, eggs, fish, gluten, and other dietary restrictions
 5.3. The system must handle edge cases and ambiguous ingredients appropriately
+5.4. The system must classify ingredients by kind: protein_main, protein_source, vegetable, grain, dairy, fat, spice, other
 
 ### 6. Output Generation
-6.1. The system must generate `recipes.csv` with columns: title, ingredients (semicolon-separated), steps (semicolon-separated), tags (JSON)
-6.2. The system must generate `recipes.json` as a JSON array of all recipes in normalized schema
-6.3. The system must generate `dataset-metadata.json` with creation stats, source counts, and validation results
-6.4. The system must generate `compliance-report.json` with licensing and attribution information
+6.1. The system must generate `recipes.json` as a JSON array of all recipes in normalized schema matching the CompleteRecipeSchema
+6.2. The system must generate `recipes.csv` with normalized columns for database import (title, description, prep_time, cook_time, total_time, servings, difficulty, etc.)
+6.3. The system must generate `ingredients.csv` with recipe_id, ingredient_name, quantity, unit, notes, is_optional, sort_order, kind
+6.4. The system must generate `instructions.csv` with recipe_id, step_number, instruction, prep_time, cook_time, temperature, notes
+6.5. The system must generate `tags.csv` with recipe_id, tag_name, tag_type
+6.6. The system must generate `dataset-metadata.json` with creation stats, source counts, and validation results
+6.7. The system must generate `compliance-report.json` with licensing and attribution information
 
 ### 7. Performance & Monitoring
 7.1. The system must complete the entire process within 30 minutes on a standard development machine
@@ -149,7 +190,7 @@ scripts/etl/
 1. **Dataset Size**: At least 1000 valid recipes generated
 2. **Processing Time**: Complete within 30 minutes
 3. **Data Quality**: <5% parsing errors, >95% successful validation rate
-4. **Coverage**: Recipes across all dietary categories (vegetarian, vegan, pescatarian, omnivore)
+4. **Coverage**: Recipes across all dietary categories (vegetarian, vegan, pescatarian, gluten-free, dairy-free, keto, paleo)
 5. **Compliance**: 100% of recipes from approved open-license sources
 6. **Deduplication**: <2% duplicate recipes in final dataset
 

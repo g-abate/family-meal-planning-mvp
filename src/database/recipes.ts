@@ -113,54 +113,54 @@ export class MealPlanningDB extends Dexie {
     });
 
     // Hooks for automatic timestamps
-    this.userPreferences.hook('creating', (primKey, obj, trans) => {
+    this.userPreferences.hook('creating', (_primKey, obj, _trans) => {
       const now = new Date().toISOString();
       obj.createdAt = now;
       obj.updatedAt = now;
     });
 
-    this.userPreferences.hook('updating', (modifications, primKey, obj, trans) => {
-      modifications.updatedAt = new Date().toISOString();
+    this.userPreferences.hook('updating', (modifications, _primKey, _obj, _trans) => {
+      (modifications as any).updatedAt = new Date().toISOString();
     });
 
-    this.mealPlans.hook('creating', (primKey, obj, trans) => {
+    this.mealPlans.hook('creating', (_primKey, obj, _trans) => {
       const now = new Date().toISOString();
       obj.createdAt = now;
       obj.updatedAt = now;
     });
 
-    this.mealPlans.hook('updating', (modifications, primKey, obj, trans) => {
-      modifications.updatedAt = new Date().toISOString();
+    this.mealPlans.hook('updating', (modifications, _primKey, _obj, _trans) => {
+      (modifications as any).updatedAt = new Date().toISOString();
     });
 
-    this.plannedMeals.hook('creating', (primKey, obj, trans) => {
+    this.plannedMeals.hook('creating', (_primKey, obj, _trans) => {
       const now = new Date().toISOString();
       obj.createdAt = now;
       obj.updatedAt = now;
     });
 
-    this.plannedMeals.hook('updating', (modifications, primKey, obj, trans) => {
-      modifications.updatedAt = new Date().toISOString();
+    this.plannedMeals.hook('updating', (modifications, _primKey, _obj, _trans) => {
+      (modifications as any).updatedAt = new Date().toISOString();
     });
 
-    this.prepSessions.hook('creating', (primKey, obj, trans) => {
+    this.prepSessions.hook('creating', (_primKey, obj, _trans) => {
       const now = new Date().toISOString();
       obj.createdAt = now;
       obj.updatedAt = now;
     });
 
-    this.prepSessions.hook('updating', (modifications, primKey, obj, trans) => {
-      modifications.updatedAt = new Date().toISOString();
+    this.prepSessions.hook('updating', (modifications, _primKey, _obj, _trans) => {
+      (modifications as any).updatedAt = new Date().toISOString();
     });
 
-    this.prepTasks.hook('creating', (primKey, obj, trans) => {
+    this.prepTasks.hook('creating', (_primKey, obj, _trans) => {
       const now = new Date().toISOString();
       obj.createdAt = now;
       obj.updatedAt = now;
     });
 
-    this.prepTasks.hook('updating', (modifications, primKey, obj, trans) => {
-      modifications.updatedAt = new Date().toISOString();
+    this.prepTasks.hook('updating', (modifications, _primKey, _obj, _trans) => {
+      (modifications as any).updatedAt = new Date().toISOString();
     });
   }
 
@@ -173,17 +173,17 @@ export class MealPlanningDB extends Dexie {
     const existing = await this.getUserPreferences();
     
     if (existing) {
-      await this.userPreferences.update(existing.id!, preferences);
-      return existing.id!;
+      await this.userPreferences.update(existing.id ?? 0, preferences);
+      return existing.id ?? 0;
     } else {
       return await this.userPreferences.add({
-        dietaryTags: preferences.dietaryTags || [],
-        prepSessions: preferences.prepSessions || 2,
-        sessionDuration: preferences.sessionDuration || 120,
-        defaultMealCount: preferences.defaultMealCount || 5,
-        defaultMealTypes: preferences.defaultMealTypes || ['dinner'],
-        favoriteIngredients: preferences.favoriteIngredients || [],
-        dislikedIngredients: preferences.dislikedIngredients || [],
+        dietaryTags: preferences.dietaryTags ?? [],
+        prepSessions: preferences.prepSessions ?? 2,
+        sessionDuration: preferences.sessionDuration ?? 120,
+        defaultMealCount: preferences.defaultMealCount ?? 5,
+        defaultMealTypes: preferences.defaultMealTypes ?? ['dinner'],
+        favoriteIngredients: preferences.favoriteIngredients ?? [],
+        dislikedIngredients: preferences.dislikedIngredients ?? [],
         ...preferences
       } as UserPreferences);
     }
@@ -215,7 +215,9 @@ export class MealPlanningDB extends Dexie {
       // Delete associated prep sessions and tasks
       const prepSessions = await this.prepSessions.where('mealPlanId').equals(id).toArray();
       for (const session of prepSessions) {
-        await this.prepTasks.where('prepSessionId').equals(session.id!).delete();
+        if (session.id) {
+          await this.prepTasks.where('prepSessionId').equals(session.id).delete();
+        }
       }
       await this.prepSessions.where('mealPlanId').equals(id).delete();
       
@@ -300,7 +302,7 @@ export class MealPlanningDB extends Dexie {
 
   // Recipe cache methods
   async cacheRecipe(recipe: Recipe): Promise<void> {
-    await this.cachedRecipes.put(recipe);
+    await this.cachedRecipes.put(recipe as any);
   }
 
   async getCachedRecipe(id: number): Promise<Recipe | undefined> {
@@ -312,7 +314,7 @@ export class MealPlanningDB extends Dexie {
   }
 
   async getCachedRecipeSummaries(): Promise<RecipeSummary[]> {
-    return await this.recipeSummaries.where('isActive').equals(true).toArray();
+    return await this.recipeSummaries.where('isActive').equals(1).toArray();
   }
 
   // Utility methods

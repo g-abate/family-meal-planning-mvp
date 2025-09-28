@@ -10,14 +10,9 @@ import type {
   RecipeSummary,
   RecipeSearchResult,
   DatabaseResult,
-  QueryOptions,
-  SearchOptions,
-  InsertRecipeData,
-  InsertIngredientData,
-  InsertInstructionData,
-  InsertTagData
+  SearchOptions
 } from '../types/database';
-import { COMMON_QUERIES, buildSearchQuery, performanceMonitor } from '../utils/sqliteUtils';
+import { COMMON_QUERIES, performanceMonitor } from '../utils/sqliteUtils';
 
 // Web Worker for SQLite operations
 class SQLiteWorkerManager {
@@ -37,11 +32,11 @@ class SQLiteWorkerManager {
       });
 
       this.worker.onmessage = (e) => {
-        const { type, id, data, error } = e.data;
-        const pending = this.pendingMessages.get(id);
+        const { type, id: messageId, data, error } = e.data;
+        const pending = this.pendingMessages.get(messageId);
         
         if (pending) {
-          this.pendingMessages.delete(id);
+          this.pendingMessages.delete(messageId);
           
           if (type === 'success') {
             pending.resolve(data);
@@ -54,7 +49,7 @@ class SQLiteWorkerManager {
       this.worker.onerror = (error) => {
         console.error('SQLite Worker error:', error);
         // Reject all pending messages
-        for (const [id, pending] of this.pendingMessages) {
+        for (const [, pending] of this.pendingMessages) {
           pending.reject(error);
         }
         this.pendingMessages.clear();
@@ -69,15 +64,15 @@ class SQLiteWorkerManager {
         return;
       }
 
-      const id = `msg_${++this.messageId}`;
-      this.pendingMessages.set(id, { resolve, reject });
+      const messageId = `msg_${++this.messageId}`;
+      this.pendingMessages.set(messageId, { resolve, reject });
 
-      this.worker.postMessage({ type, id, data });
+      this.worker.postMessage({ type, id: messageId, data });
 
       // Timeout after 30 seconds
       setTimeout(() => {
-        if (this.pendingMessages.has(id)) {
-          this.pendingMessages.delete(id);
+        if (this.pendingMessages.has(messageId)) {
+          this.pendingMessages.delete(messageId);
           reject(new Error('Worker operation timeout'));
         }
       }, 30000);

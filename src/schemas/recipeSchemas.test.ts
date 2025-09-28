@@ -5,7 +5,6 @@ import { describe, it, expect } from 'vitest';
 import {
   RecipeSchema,
   RecipeIngredientSchema,
-  RecipeInstructionSchema,
   CompleteRecipeSchema,
   UserPreferencesSchema,
   MealPlanSchema,
