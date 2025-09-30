@@ -19,6 +19,20 @@ global.Worker = vi.fn(() => mockWorker) as any;
 // Mock URL constructor
 global.URL = vi.fn((url: string) => ({ href: url })) as any;
 
+  // Mock the worker initialization to resolve immediately
+  mockWorker.postMessage.mockImplementation((message) => {
+    // Simulate immediate worker response
+    if (mockWorker.onmessage) {
+      mockWorker.onmessage({
+        data: {
+          type: 'success',
+          id: message.id,
+          data: { success: true }
+        }
+      });
+    }
+  });
+
 describe('RecipeService', () => {
   let service: RecipeService;
 

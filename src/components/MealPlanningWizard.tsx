@@ -8,13 +8,15 @@ import { PrepStyleStep } from './wizard-steps/PrepStyleStep';
 interface MealPlanningWizardProps {
   isOpen: boolean;
   onClose: () => void;
+  onComplete?: () => void;
 }
 
 export function MealPlanningWizard({
   isOpen,
   onClose,
+  onComplete,
 }: MealPlanningWizardProps) {
-  const { currentStep, totalSteps, nextStep, previousStep, canProceed, isStepValid, resetWizard } =
+  const { currentStep, totalSteps, nextStep, previousStep, canProceed, resetWizard, completeWizard } =
     useWizardStore();
 
   const firstInputRef = useRef<HTMLInputElement>(null);
@@ -101,6 +103,10 @@ export function MealPlanningWizard({
   const handleNext = () => {
     if (currentStep < totalSteps && canProceed()) {
       nextStep();
+    } else if (currentStep === totalSteps && canProceed()) {
+      // Wizard completed
+      completeWizard();
+      onComplete?.();
     }
   };
 
@@ -253,7 +259,7 @@ export function MealPlanningWizard({
             </button>
 
             <button
-              onClick={currentStep === totalSteps ? handleClose : handleNext}
+              onClick={handleNext}
               disabled={!canProceed()}
               className='btn btn-primary btn-md disabled:opacity-50 disabled:cursor-not-allowed'
             >

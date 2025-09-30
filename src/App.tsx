@@ -2,9 +2,52 @@ import { useState } from 'react';
 import ErrorBoundary from './components/ErrorBoundary';
 import UpdatePrompt from './components/UpdatePrompt';
 import { MealPlanningWizard } from './components/MealPlanningWizard';
+import WeeklyView from './components/WeeklyView';
+import MealPrepPlan from './components/MealPrepPlan';
 
 function App() {
   const [isWizardOpen, setIsWizardOpen] = useState(false);
+  const [showWeeklyView, setShowWeeklyView] = useState(false);
+  const [showPrepPlan, setShowPrepPlan] = useState(false);
+
+  const handleWizardComplete = () => {
+    setIsWizardOpen(false);
+    setShowWeeklyView(true);
+  };
+
+  const handleStartNewPlan = () => {
+    setShowWeeklyView(false);
+    setIsWizardOpen(true);
+  };
+
+  const handleViewPrepPlan = () => {
+    setShowPrepPlan(true);
+  };
+
+  const handleBackFromPrepPlan = () => {
+    setShowPrepPlan(false);
+  };
+
+  if (showPrepPlan) {
+    return (
+      <ErrorBoundary>
+        <MealPrepPlan onBack={handleBackFromPrepPlan} />
+        <UpdatePrompt />
+      </ErrorBoundary>
+    );
+  }
+
+  if (showWeeklyView) {
+    return (
+      <ErrorBoundary>
+        <WeeklyView 
+          onStartNewPlan={handleStartNewPlan}
+          onViewPrepPlan={handleViewPrepPlan}
+        />
+        <UpdatePrompt />
+      </ErrorBoundary>
+    );
+  }
 
   return (
     <ErrorBoundary>
@@ -130,6 +173,7 @@ function App() {
         <MealPlanningWizard
           isOpen={isWizardOpen}
           onClose={() => setIsWizardOpen(false)}
+          onComplete={handleWizardComplete}
         />
 
         {/* PWA Update Prompt */}

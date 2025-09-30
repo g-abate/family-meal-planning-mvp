@@ -14,7 +14,7 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { parse } from 'csv-parse';
 import { createReadStream } from 'fs';
-import { Database } from 'sql.js';
+import type { Database } from 'sql.js';
 import initSqlJs from 'sql.js';
 
 // Import our data transformation utilities
@@ -56,7 +56,7 @@ class Top500RecipeImporter {
   private processedCount = 0;
   private errorCount = 0;
   private skippedCount = 0;
-  private SQLModule: awaitedReturnType<typeof initSqlJs> | null = null;
+  private SQLModule: Awaited<ReturnType<typeof initSqlJs>> | null = null;
 
   async initialize(): Promise<void> {
     console.log('Initializing SQLite database...');
@@ -440,17 +440,10 @@ class Top500RecipeImporter {
     `);
 
     if (sampleRecipe.length > 0 && sampleRecipe[0].values.length > 0) {
-      const [recipeId, title, difficulty, prepTime, cookTime, totalTime] = sampleRecipe[0].values[0];
-
-      // Get sample ingredients
-      const sampleIngredients = this.db.exec(`
-        SELECT ri.ingredient_name, ri.quantity, ri.unit, ri.kind
-        FROM recipe_ingredients ri
-        WHERE ri.recipe_id = ${recipeId}
-        LIMIT 5
-      `);
+      const [recipeId] = sampleRecipe[0].values[0];
 
       // Optionally, we could log a summary or perform additional checks here
+      void recipeId;
     } else {
       console.log('No recipes found in database to display sample data.');
     }

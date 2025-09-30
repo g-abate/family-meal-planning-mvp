@@ -78,18 +78,18 @@ describe('MealPlanningWizard', () => {
   it('has accessible navigation buttons', () => {
     render(<MealPlanningWizard isOpen={true} onClose={mockOnClose} />);
 
-    const backButton = screen.getByRole('button', { name: /back/i });
+    const backButtons = screen.getAllByRole('button', { name: /back/i });
     const continueButton = screen.getByRole('button', { name: /continue/i });
 
-    expect(backButton).toBeInTheDocument();
+    expect(backButtons).toHaveLength(2); // Header and footer back buttons
     expect(continueButton).toBeInTheDocument();
   });
 
   it('calls onClose when close button is clicked', () => {
     render(<MealPlanningWizard isOpen={true} onClose={mockOnClose} />);
 
-    // Use the specific "Close" button in the footer
-    const closeButton = screen.getByRole('button', { name: 'Close' });
+    // Use the specific "Close wizard" button in the header
+    const closeButton = screen.getByRole('button', { name: 'Close wizard' });
     fireEvent.click(closeButton);
 
     expect(mockOnClose).toHaveBeenCalledTimes(1);

@@ -44,7 +44,7 @@ describe('IngredientParser', () => {
 
       expect(result.ingredient_name).toBe('firmly packed brown sugar');
       expect(result.quantity).toBe(1);
-      expect(result.unit).toBe('c.');
+      expect(result.unit).toBe('cup');
     });
 
     it('should parse ingredient without unit', () => {
@@ -105,7 +105,7 @@ describe('IngredientParser', () => {
 describe('InstructionParser', () => {
   describe('parseInstruction', () => {
     it('should parse simple instruction', () => {
-      const result = InstructionParser.parseInstruction('Heat oil in a pan');
+      const result = InstructionParser.parseInstruction('Heat oil in a pan', 1);
 
       expect(result.instruction).toBe('Heat oil in a pan');
       expect(result.prep_time).toBeUndefined();
@@ -115,35 +115,39 @@ describe('InstructionParser', () => {
 
     it('should extract prep time from instruction', () => {
       const result = InstructionParser.parseInstruction(
-        'Chop vegetables (5 minutes)'
+        'Chop vegetables (5 minutes)',
+        1
       );
 
       expect(result.instruction).toBe('Chop vegetables (5 minutes)');
-      expect(result.prep_time).toBe(NaN);
+      expect(result.prep_time).toBeUndefined();
     });
 
     it('should extract cook time from instruction', () => {
       const result = InstructionParser.parseInstruction(
-        'Bake for 30 minutes at 350°F'
+        'Bake for 30 minutes at 350°F',
+        1
       );
 
       expect(result.instruction).toBe('Bake for 30 minutes at 350°F');
-      expect(result.cook_time).toBe(NaN);
-      expect(result.temperature).toBe(NaN);
+      expect(result.cook_time).toBe(30);
+      expect(result.temperature).toBe(350);
     });
 
     it('should extract temperature from instruction', () => {
       const result = InstructionParser.parseInstruction(
-        'Preheat oven to 400 degrees'
+        'Preheat oven to 400 degrees',
+        1
       );
 
       expect(result.instruction).toBe('Preheat oven to 400 degrees');
-      expect(result.temperature).toBeUndefined();
+      expect(result.temperature).toBe(400);
     });
 
     it('should handle complex instructions with multiple time references', () => {
       const result = InstructionParser.parseInstruction(
-        'Marinate for 2 hours, then cook for 45 minutes at 375°F'
+        'Marinate for 2 hours, then cook for 45 minutes at 375°F',
+        1
       );
 
       expect(result.instruction).toBe(
@@ -151,20 +155,21 @@ describe('InstructionParser', () => {
       );
       expect(result.prep_time).toBeUndefined();
       expect(result.cook_time).toBe(45);
-      expect(result.temperature).toBe(NaN);
+      expect(result.temperature).toBe(375);
     });
 
     it('should handle instructions with temperature in Celsius', () => {
       const result = InstructionParser.parseInstruction(
-        'Bake at 180°C for 25 minutes'
+        'Bake at 180°C for 25 minutes',
+        1
       );
 
-      expect(result.temperature).toBe(NaN);
+      expect(result.temperature).toBe(356);
     });
 
     it('should handle empty or invalid input', () => {
-      const empty = InstructionParser.parseInstruction('');
-      const invalid = InstructionParser.parseInstruction('   ');
+      const empty = InstructionParser.parseInstruction('', 1);
+      const invalid = InstructionParser.parseInstruction('   ', 1);
 
       expect(empty.instruction).toBe('');
       expect(invalid.instruction).toBe('');

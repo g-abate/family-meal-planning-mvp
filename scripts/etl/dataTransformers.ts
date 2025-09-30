@@ -32,7 +32,7 @@
  * Version: 1.0
  */
 
-import { RecipeIngredient, RecipeInstruction, RecipeTag } from '../../src/schemas/recipeSchemas';
+import type { RecipeIngredient, RecipeInstruction } from '../../src/schemas/recipeSchemas';
 
 /**
  * IngredientParser - Converts unstructured ingredient strings into structured data
@@ -701,7 +701,7 @@ export class IngredientParser {
     
     // Volume unit normalization
     const volumeMap: { [key: string]: string } = {
-      'c': 'cup', 'cups': 'cup', 'cup': 'cup',
+      'c': 'cup', 'c.': 'cup', 'cups': 'cup', 'cup': 'cup',
       'tbsp': 'tablespoon', 'tablespoon': 'tablespoon', 'tablespoons': 'tablespoon',
       'tsp': 'teaspoon', 'teaspoon': 'teaspoon', 'teaspoons': 'teaspoon',
       'fl oz': 'fluid ounce', 'fluid ounce': 'fluid ounce', 'fluid ounces': 'fluid ounce',
@@ -753,22 +753,22 @@ export class InstructionParser {
   // Regex patterns to identify time references in cooking instructions
   private static readonly TIME_PATTERNS = [
     // Time ranges: "15-20 minutes", "1 to 2 hours"
-    /(\d+)\s*(?:to|-)\s*(\d+)\s*(minute|minutes|min|hour|hours|hr|hrs)/gi,
+    /(\d+)\s*(?:to|-)\s*(\d+)\s*(minute|minutes|min|hour|hours|hr|hrs)/i,
     // Single times: "30 minutes", "1 hour"
-    /(\d+)\s*(minute|minutes|min|hour|hours|hr|hrs)/gi,
+    /(\d+)\s*(minute|minutes|min|hour|hours|hr|hrs)/i,
     // Contextual times: "for about 15 minutes", "approximately 1 hour"
-    /(?:for|about|approximately)\s*(\d+)\s*(minute|minutes|min|hour|hours|hr|hrs)/gi
+    /(?:for|about|approximately)\s*(\d+)\s*(minute|minutes|min|hour|hours|hr|hrs)/i
   ];
 
   // Regex patterns to identify temperature references
   private static readonly TEMPERATURE_PATTERNS = [
     // Fahrenheit: "350°F", "350 F"
-    /(\d+)\s*°?\s*[fF]/g,
+    /(\d+)\s*°?\s*[fF]/i,
     // Celsius: "180°C", "180 C"
-    /(\d+)\s*°?\s*[cC]/g,
+    /(\d+)\s*°?\s*[cC]/i,
     // Word format: "350 degrees F", "180 degrees C"
-    /(\d+)\s*degrees?\s*[fF]/gi,
-    /(\d+)\s*degrees?\s*[cC]/gi
+    /(\d+)\s*degrees?\s*[fF]/i,
+    /(\d+)\s*degrees?\s*[cC]/i
   ];
 
   static parseInstruction(instructionStr: string, stepNumber: number): RecipeInstruction {
@@ -789,12 +789,14 @@ export class InstructionParser {
         
         // Determine if it's prep or cook time based on context
         const context = instruction ? instruction.toLowerCase() : '';
-        if (context.includes('bake') || context.includes('cook') || context.includes('fry') || 
-            context.includes('grill') || context.includes('roast') || context.includes('simmer')) {
-          cookTime = minutes;
-        } else if (context.includes('prep') || context.includes('chop') || context.includes('slice') ||
-                   context.includes('dice') || context.includes('mix') || context.includes('stir')) {
+        if (context.includes('prep') || context.includes('chop') || context.includes('slice') ||
+            context.includes('dice') || context.includes('mix') || context.includes('stir') ||
+            context.includes('prepare') || context.includes('cut') || context.includes('mince')) {
           prepTime = minutes;
+        } else if (context.includes('bake') || context.includes('cook') || context.includes('fry') || 
+                   context.includes('grill') || context.includes('roast') || context.includes('simmer') ||
+                   context.includes('boil') || context.includes('steam') || context.includes('broil')) {
+          cookTime = minutes;
         } else {
           // Default to cook time if unclear
           cookTime = minutes;
