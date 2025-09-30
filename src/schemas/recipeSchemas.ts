@@ -13,6 +13,9 @@ export const IngredientKind = z.enum([
   'dairy',
   'fat',
   'spice',
+  'fruit',
+  'nuts_seeds',
+  'condiments',
   'other'
 ]);
 
