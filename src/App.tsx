@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import ErrorBoundary from './components/ErrorBoundary';
 import UpdatePrompt from './components/UpdatePrompt';
-import { MealPlanningWizardSimple } from './components/MealPlanningWizardSimple';
+import { MealPlanningWizard } from './components/MealPlanningWizard';
 
 function App() {
   const [isWizardOpen, setIsWizardOpen] = useState(false);
@@ -127,7 +127,7 @@ function App() {
         </main>
 
         {/* Meal Planning Wizard */}
-        <MealPlanningWizardSimple
+        <MealPlanningWizard
           isOpen={isWizardOpen}
           onClose={() => setIsWizardOpen(false)}
         />

@@ -3,7 +3,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import {
+import type {
   WizardState,
   MealCountStep,
   IngredientsStep,
@@ -41,6 +41,7 @@ const initialWizardState: WizardState = {
   ingredients: {
     availableProteins: [],
     availableVegetables: [],
+    availableStarches: [],
   },
   dietary: {
     restrictions: [],
@@ -140,8 +141,9 @@ export const useWizardStore = create<WizardStore>()(
     }),
     {
       name: 'meal-planning-wizard',
-      // Only persist the form data, not navigation state
+      // Persist form data and navigation state
       partialize: state => ({
+        currentStep: state.currentStep,
         mealCount: state.mealCount,
         ingredients: state.ingredients,
         dietary: state.dietary,

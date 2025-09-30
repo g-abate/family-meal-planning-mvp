@@ -1,6 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { useWizardStore } from '../stores/wizardStore';
 import { MealCountStep } from './wizard-steps/MealCountStep';
+import { IngredientsStep } from './wizard-steps/IngredientsStep';
+import { DietaryStep } from './wizard-steps/DietaryStep';
+import { PrepStyleStep } from './wizard-steps/PrepStyleStep';
 
 interface MealPlanningWizardProps {
   isOpen: boolean;
@@ -11,10 +14,15 @@ export function MealPlanningWizard({
   isOpen,
   onClose,
 }: MealPlanningWizardProps) {
-  const { currentStep, totalSteps, nextStep, previousStep, canProceed } =
+  const { currentStep, totalSteps, nextStep, previousStep, canProceed, isStepValid, resetWizard } =
     useWizardStore();
 
   const firstInputRef = useRef<HTMLInputElement>(null);
+
+  const handleClose = () => {
+    resetWizard();
+    onClose();
+  };
 
   // Focus first input when wizard opens
   useEffect(() => {
@@ -29,7 +37,7 @@ export function MealPlanningWizard({
       if (!isOpen) return;
 
       if (event.key === 'Escape') {
-        onClose();
+        handleClose();
       } else if (event.key === 'Enter' && canProceed()) {
         if (currentStep < totalSteps) {
           nextStep();
@@ -39,7 +47,7 @@ export function MealPlanningWizard({
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, currentStep, totalSteps, canProceed, nextStep, onClose]);
+  }, [isOpen, currentStep, totalSteps, canProceed, nextStep, handleClose]);
 
   if (!isOpen) return null;
 
@@ -63,7 +71,7 @@ export function MealPlanningWizard({
       case 1:
         return 'How many meals do you need this week?';
       case 2:
-        return 'What proteins and vegetables do you have?';
+        return 'What proteins, vegetables, and starches do you have?';
       case 3:
         return 'Any dietary restrictions to consider?';
       case 4:
@@ -73,30 +81,18 @@ export function MealPlanningWizard({
     }
   };
 
-  const progressPercentage = (currentStep / totalSteps) * 100;
+  const progress = (currentStep / totalSteps) * 100;
 
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
         return <MealCountStep ref={firstInputRef} />;
       case 2:
-        return (
-          <div className='text-center text-sage-500'>
-            Ingredients step placeholder
-          </div>
-        );
+        return <IngredientsStep ref={firstInputRef} />;
       case 3:
-        return (
-          <div className='text-center text-sage-500'>
-            Dietary step placeholder
-          </div>
-        );
+        return <DietaryStep ref={firstInputRef} />;
       case 4:
-        return (
-          <div className='text-center text-sage-500'>
-            Prep style step placeholder
-          </div>
-        );
+        return <PrepStyleStep ref={firstInputRef} />;
       default:
         return null;
     }
@@ -117,7 +113,7 @@ export function MealPlanningWizard({
   return (
     <div className='fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in'>
       <div
-        className='card-luxury max-w-4xl w-full max-h-[90vh] overflow-hidden animate-scale-in'
+        className='card-luxury max-w-4xl w-full max-h-[90vh] overflow-hidden animate-scale-in flex flex-col'
         role='dialog'
         aria-labelledby='wizard-title'
         aria-describedby='wizard-description'
@@ -127,9 +123,10 @@ export function MealPlanningWizard({
           <div className='flex items-center justify-between'>
             <div className='flex items-center space-x-4'>
               <button
-                onClick={onClose}
-                className='p-2 rounded-lg hover:bg-sage-50 transition-colors'
-                aria-label='Close wizard'
+                onClick={handlePrevious}
+                disabled={currentStep === 1}
+                className='p-2 rounded-lg hover:bg-sage-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+                aria-label='Go back'
               >
                 <svg
                   className='w-5 h-5 text-sage-600'
@@ -158,7 +155,7 @@ export function MealPlanningWizard({
               </div>
             </div>
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className='p-2 rounded-lg hover:bg-sage-50 transition-colors'
               aria-label='Close wizard'
             >
@@ -204,13 +201,13 @@ export function MealPlanningWizard({
                   {getStepTitle()}
                 </span>
                 <span className='text-sm text-sage-600'>
-                  {Math.round(progressPercentage)}% complete
+                  {Math.round(progress)}% complete
                 </span>
               </div>
               <div className='w-full bg-sage-100 rounded-full h-2 mt-1'>
                 <div
                   className='bg-primary-500 h-2 rounded-full transition-all duration-300 ease-out'
-                  style={{ width: `${progressPercentage}%` }}
+                  style={{ width: `${progress}%` }}
                 />
               </div>
             </div>
@@ -218,7 +215,7 @@ export function MealPlanningWizard({
         </div>
 
         {/* Content */}
-        <div className='card-body overflow-y-auto'>
+        <div className='card-body flex-1 overflow-y-auto'>
           <div className='max-w-2xl mx-auto'>
             <div className='text-center mb-8'>
               <h3 className='text-2xl font-semibold text-primary-500 mb-2'>
@@ -255,42 +252,37 @@ export function MealPlanningWizard({
               Back
             </button>
 
-            <div className='flex space-x-2'>
-              <button onClick={onClose} className='btn btn-secondary btn-md'>
-                Close
-              </button>
-              <button
-                onClick={currentStep === totalSteps ? onClose : handleNext}
-                disabled={!canProceed()}
-                className='btn btn-primary btn-md disabled:opacity-50 disabled:cursor-not-allowed'
-              >
-                {currentStep === totalSteps ? 'Create Meal Plan' : 'Continue'}
-                {currentStep !== totalSteps && (
-                  <svg
-                    className='w-4 h-4 ml-2'
-                    fill='none'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'
-                  >
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth={2}
-                      d='M9 5l7 7-7 7'
-                    />
-                  </svg>
-                )}
-                {currentStep === totalSteps && (
-                  <svg
-                    className='w-4 h-4 ml-2'
-                    fill='currentColor'
-                    viewBox='0 0 20 20'
-                  >
-                    <path d='M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z' />
-                  </svg>
-                )}
-              </button>
-            </div>
+            <button
+              onClick={currentStep === totalSteps ? handleClose : handleNext}
+              disabled={!canProceed()}
+              className='btn btn-primary btn-md disabled:opacity-50 disabled:cursor-not-allowed'
+            >
+              {currentStep === totalSteps ? 'Create Meal Plan' : 'Continue'}
+              {currentStep !== totalSteps && (
+                <svg
+                  className='w-4 h-4 ml-2'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M9 5l7 7-7 7'
+                  />
+                </svg>
+              )}
+              {currentStep === totalSteps && (
+                <svg
+                  className='w-4 h-4 ml-2'
+                  fill='currentColor'
+                  viewBox='0 0 20 20'
+                >
+                  <path d='M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z' />
+                </svg>
+              )}
+            </button>
           </div>
         </div>
       </div>

@@ -82,7 +82,7 @@ describe('App', () => {
     await user.click(startButton);
 
     const modal = screen.getByRole('dialog', {
-      name: /meal planning wizard/i,
+      name: /plan your meals/i,
     });
     expect(modal).toBeInTheDocument();
   });
@@ -97,7 +97,7 @@ describe('App', () => {
     await user.click(getStartedButton);
 
     const modal = screen.getByRole('dialog', {
-      name: /meal planning wizard/i,
+      name: /plan your meals/i,
     });
     expect(modal).toBeInTheDocument();
   });
@@ -112,12 +112,12 @@ describe('App', () => {
     await user.click(startButton);
 
     const modal = screen.getByRole('dialog', {
-      name: /meal planning wizard/i,
+      name: /plan your meals/i,
     });
     expect(modal).toBeInTheDocument();
 
     const closeButton = screen.getByRole('button', {
-      name: /close/i,
+      name: /close wizard/i,
     });
 
     await user.click(closeButton);
@@ -125,7 +125,7 @@ describe('App', () => {
     expect(modal).not.toBeInTheDocument();
   });
 
-  it('closes wizard modal when continue button is clicked', async () => {
+  it('closes wizard modal when X button is clicked', async () => {
     render(<App />);
 
     const startButton = screen.getByRole('button', {
@@ -135,15 +135,15 @@ describe('App', () => {
     await user.click(startButton);
 
     const modal = screen.getByRole('dialog', {
-      name: /meal planning wizard/i,
+      name: /plan your meals/i,
     });
     expect(modal).toBeInTheDocument();
 
-    const continueButton = screen.getByRole('button', {
-      name: /continue/i,
+    const closeButton = screen.getByRole('button', {
+      name: /close wizard/i,
     });
 
-    await user.click(continueButton);
+    await user.click(closeButton);
 
     expect(modal).not.toBeInTheDocument();
   });

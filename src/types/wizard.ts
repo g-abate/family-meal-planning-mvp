@@ -32,6 +32,7 @@ export interface MealCountStep {
 export interface IngredientsStep {
   availableProteins: string[];
   availableVegetables: string[];
+  availableStarches: string[];
 }
 
 export interface DietaryStep {
@@ -58,6 +59,7 @@ export interface WizardFormData {
   mealTypes: MealType[];
   availableProteins: string[];
   availableVegetables: string[];
+  availableStarches: string[];
   restrictions: DietaryRestriction[];
   sessionsPerWeek: number;
   sessionDuration: PrepDuration;
@@ -93,6 +95,23 @@ export const AVAILABLE_VEGETABLES = [
   'Cauliflower',
   'Sweet Potatoes',
   'Potatoes',
+] as const;
+
+export const AVAILABLE_STARCHES = [
+  'Rice',
+  'Quinoa',
+  'Pasta',
+  'Bread',
+  'Tortillas',
+  'Oats',
+  'Barley',
+  'Couscous',
+  'Polenta',
+  'Noodles',
+  'Crackers',
+  'Cereal',
+  'Granola',
+  'Biscuits',
 ] as const;
 
 export const DIETARY_RESTRICTIONS: DietaryRestriction[] = [
