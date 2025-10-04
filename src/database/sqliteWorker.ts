@@ -258,7 +258,7 @@ self.onmessage = async function(e: MessageEvent<WorkerMessage>) {
 
   try {
     switch (type) {
-      case 'init':
+      case 'init': {
         const initResult = await initializeDatabase(data?.dbData);
         response = {
           type: initResult.success ? 'success' : 'error',
@@ -267,8 +267,9 @@ self.onmessage = async function(e: MessageEvent<WorkerMessage>) {
           error: initResult.error?.message
         };
         break;
+      }
 
-      case 'execute':
+      case 'execute': {
         const executeResult = executeSQL(data.sql, data.params);
         response = {
           type: executeResult.success ? 'success' : 'error',
@@ -277,8 +278,9 @@ self.onmessage = async function(e: MessageEvent<WorkerMessage>) {
           error: executeResult.error?.message
         };
         break;
+      }
 
-      case 'query':
+      case 'query': {
         const queryResult = querySQL(data.sql, data.params);
         response = {
           type: queryResult.success ? 'success' : 'error',
@@ -287,8 +289,9 @@ self.onmessage = async function(e: MessageEvent<WorkerMessage>) {
           error: queryResult.error?.message
         };
         break;
+      }
 
-      case 'search':
+      case 'search': {
         const searchResult = searchRecipes(data.options);
         response = {
           type: searchResult.success ? 'success' : 'error',
@@ -297,8 +300,9 @@ self.onmessage = async function(e: MessageEvent<WorkerMessage>) {
           error: searchResult.error?.message
         };
         break;
+      }
 
-      case 'close':
+      case 'close': {
         const closeResult = closeDatabase();
         response = {
           type: closeResult.success ? 'success' : 'error',
@@ -307,6 +311,7 @@ self.onmessage = async function(e: MessageEvent<WorkerMessage>) {
           error: closeResult.error?.message
         };
         break;
+      }
 
       default:
         throw new Error(`Unknown message type: ${type}`);

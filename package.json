@@ -15,6 +15,9 @@
     "test:coverage": "vitest --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
+    "mcp:start": "chmod +x scripts/start-mcp.sh && ./scripts/start-mcp.sh",
+    "mcp:test-mobile": "chmod +x scripts/test-mobile-responsive.sh && ./scripts/test-mobile-responsive.sh",
+    "test:full": "chmod +x scripts/start-testing-environment.sh && ./scripts/start-testing-environment.sh",
     "etl:build": "node scripts/etl/buildRecipes.js",
     "etl:import": "tsx scripts/etl/importRecipesV2.ts",
     "format": "prettier --write .",
@@ -25,6 +28,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
+    "@playwright/mcp": "^0.0.41",
     "clsx": "^2.1.1",
     "csv-parse": "^6.1.0",
     "date-fns": "^4.1.0",

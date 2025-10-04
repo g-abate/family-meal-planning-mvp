@@ -67,6 +67,7 @@ function App() {
               <button
                 onClick={() => setIsWizardOpen(true)}
                 className='btn btn-primary btn-md animate-fade-in'
+                tabIndex={1}
               >
                 Start Planning
               </button>
@@ -88,7 +89,8 @@ function App() {
               </p>
               <button
                 onClick={() => setIsWizardOpen(true)}
-                className='btn btn-primary btn-lg animate-float'
+                className='btn btn-primary btn-lg'
+                tabIndex={2}
               >
                 Get Started
               </button>
@@ -160,7 +162,8 @@ function App() {
                 </p>
                 <button
                   onClick={() => setIsWizardOpen(true)}
-                  className='btn btn-accent btn-lg animate-pulse-soft'
+                  className='btn btn-accent btn-lg'
+                  tabIndex={3}
                 >
                   Start Your Free Plan
                 </button>

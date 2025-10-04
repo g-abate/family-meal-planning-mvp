@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Clock, ChefHat, Thermometer, Timer, CheckCircle, Package, Zap } from 'lucide-react';
+import { ArrowLeft, ChefHat, Thermometer, Timer, CheckCircle, Package, Zap } from 'lucide-react';
 
 interface MealPrepPlanProps {
   onBack: () => void;
@@ -77,7 +77,7 @@ const prepPhases: PrepPhase[] = [
   {
     id: 'starches',
     title: 'Starches',
-    duration: '20 min',
+    duration: '15 min',
     icon: <Package className="w-5 h-5" />,
     color: 'bg-yellow-500',
     tasks: [
@@ -88,7 +88,7 @@ const prepPhases: PrepPhase[] = [
   {
     id: 'assembly',
     title: 'Assembly & Storage',
-    duration: '30 min',
+    duration: '25 min',
     icon: <CheckCircle className="w-5 h-5" />,
     color: 'bg-purple-500',
     tasks: [

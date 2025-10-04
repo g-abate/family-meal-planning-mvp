@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, user } from '../test/utils';
 import WeeklyCalendar from './WeeklyCalendar';
-import type { MealPlan, Meal } from './WeeklyView';
+import type { MealPlan } from './WeeklyView';
 
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
@@ -27,7 +27,7 @@ vi.mock('date-fns', () => ({
     return '2024-01-01';
   }),
   addDays: vi.fn((date: Date, days: number) => new Date(date.getTime() + days * 24 * 60 * 60 * 1000)),
-  startOfWeek: vi.fn((date: Date) => new Date('2024-01-01')),
+  startOfWeek: vi.fn((_date: Date) => new Date('2024-01-01')),
 }));
 
 const mockMealPlan: MealPlan = {

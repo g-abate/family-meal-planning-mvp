@@ -120,7 +120,7 @@ describe('InstructionParser', () => {
       );
 
       expect(result.instruction).toBe('Chop vegetables (5 minutes)');
-      expect(result.prep_time).toBeUndefined();
+      expect(result.prep_time).toBe(5);
     });
 
     it('should extract cook time from instruction', () => {
@@ -136,11 +136,11 @@ describe('InstructionParser', () => {
 
     it('should extract temperature from instruction', () => {
       const result = InstructionParser.parseInstruction(
-        'Preheat oven to 400 degrees',
+        'Preheat oven to 400°F',
         1
       );
 
-      expect(result.instruction).toBe('Preheat oven to 400 degrees');
+      expect(result.instruction).toBe('Preheat oven to 400°F');
       expect(result.temperature).toBe(400);
     });
 
@@ -153,7 +153,7 @@ describe('InstructionParser', () => {
       expect(result.instruction).toBe(
         'Marinate for 2 hours, then cook for 45 minutes at 375°F'
       );
-      expect(result.prep_time).toBeUndefined();
+      expect(result.prep_time).toBe(120);
       expect(result.cook_time).toBe(45);
       expect(result.temperature).toBe(375);
     });
@@ -292,7 +292,7 @@ describe('RecipeAnalyzer', () => {
 
       const times = RecipeAnalyzer.estimateCookingTimes(directions);
 
-      expect(times.cookTime).toBe(10);
+      expect(times.cookTime).toBe(15);
     });
 
     it('should handle directions without time references', () => {

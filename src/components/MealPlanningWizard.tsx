@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useWizardStore } from '../stores/wizardStore';
 import { MealCountStep } from './wizard-steps/MealCountStep';
 import { IngredientsStep } from './wizard-steps/IngredientsStep';
@@ -21,10 +21,10 @@ export function MealPlanningWizard({
 
   const firstInputRef = useRef<HTMLInputElement>(null);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     resetWizard();
     onClose();
-  };
+  }, [resetWizard, onClose]);
 
   // Focus first input when wizard opens
   useEffect(() => {
@@ -121,8 +121,10 @@ export function MealPlanningWizard({
       <div
         className='card-luxury max-w-4xl w-full max-h-[90vh] overflow-hidden animate-scale-in flex flex-col'
         role='dialog'
+        aria-modal='true'
         aria-labelledby='wizard-title'
         aria-describedby='wizard-description'
+        aria-hidden='false'
       >
         {/* Header */}
         <div className='card-header border-b border-sage-100'>
@@ -133,6 +135,7 @@ export function MealPlanningWizard({
                 disabled={currentStep === 1}
                 className='p-2 rounded-lg hover:bg-sage-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
                 aria-label='Go back'
+                tabIndex={1}
               >
                 <svg
                   className='w-5 h-5 text-sage-600'
@@ -164,6 +167,7 @@ export function MealPlanningWizard({
               onClick={handleClose}
               className='p-2 rounded-lg hover:bg-sage-50 transition-colors'
               aria-label='Close wizard'
+              tabIndex={2}
             >
               <svg
                 className='w-5 h-5 text-sage-600'
@@ -221,16 +225,18 @@ export function MealPlanningWizard({
         </div>
 
         {/* Content */}
-        <div className='card-body flex-1 overflow-y-auto'>
+        <div className='card-body flex-1 overflow-y-auto' role='main' aria-live='polite'>
           <div className='max-w-2xl mx-auto'>
             <div className='text-center mb-8'>
-              <h3 className='text-2xl font-semibold text-primary-500 mb-2'>
+              <h3 className='text-2xl font-semibold text-primary-500 mb-2' id='step-title'>
                 {getStepTitle()}
               </h3>
-              <p className='text-lg text-sage-600'>{getStepDescription()}</p>
+              <p className='text-lg text-sage-600' id='step-description'>{getStepDescription()}</p>
             </div>
 
-            {renderStepContent()}
+            <div role='form' aria-labelledby='step-title' aria-describedby='step-description'>
+              {renderStepContent()}
+            </div>
           </div>
         </div>
 
@@ -241,6 +247,7 @@ export function MealPlanningWizard({
               onClick={handlePrevious}
               disabled={currentStep === 1}
               className='btn btn-secondary btn-md disabled:opacity-50 disabled:cursor-not-allowed'
+              tabIndex={3}
             >
               <svg
                 className='w-4 h-4 mr-2'
@@ -262,6 +269,7 @@ export function MealPlanningWizard({
               onClick={handleNext}
               disabled={!canProceed()}
               className='btn btn-primary btn-md disabled:opacity-50 disabled:cursor-not-allowed'
+              tabIndex={4}
             >
               {currentStep === totalSteps ? 'Create Meal Plan' : 'Continue'}
               {currentStep !== totalSteps && (

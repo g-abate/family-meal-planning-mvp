@@ -30,6 +30,8 @@ describe('MealPrepPlan', () => {
     expect(screen.getByText('20 min')).toBeInTheDocument();
     expect(screen.getByText('40 min, overlapping')).toBeInTheDocument();
     expect(screen.getByText('30 min')).toBeInTheDocument();
+    expect(screen.getByText('15 min')).toBeInTheDocument();
+    expect(screen.getByText('25 min')).toBeInTheDocument();
   });
 
   it('calls onBack when back button is clicked', () => {

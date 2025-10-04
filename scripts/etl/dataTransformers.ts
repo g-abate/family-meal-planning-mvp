@@ -778,30 +778,44 @@ export class InstructionParser {
     let cookTime: number | undefined;
     let prepTime: number | undefined;
     
+    // Find all time references in the instruction
+    const timeMatches: Array<{time: number, minutes: number, context: string}> = [];
+    
     for (const pattern of this.TIME_PATTERNS) {
-      const match = instruction.match(pattern);
-      if (match) {
+      let match;
+      const regex = new RegExp(pattern.source, `${pattern.flags  }g`);
+      while ((match = regex.exec(instruction)) !== null) {
         const time = parseInt(match[1]);
         const unit = match[2] ? match[2].toLowerCase() : '';
         
         // Convert to minutes
         const minutes = unit.includes('hour') ? time * 60 : time;
         
-        // Determine if it's prep or cook time based on context
-        const context = instruction ? instruction.toLowerCase() : '';
-        if (context.includes('prep') || context.includes('chop') || context.includes('slice') ||
-            context.includes('dice') || context.includes('mix') || context.includes('stir') ||
-            context.includes('prepare') || context.includes('cut') || context.includes('mince')) {
-          prepTime = minutes;
-        } else if (context.includes('bake') || context.includes('cook') || context.includes('fry') || 
-                   context.includes('grill') || context.includes('roast') || context.includes('simmer') ||
-                   context.includes('boil') || context.includes('steam') || context.includes('broil')) {
-          cookTime = minutes;
-        } else {
-          // Default to cook time if unclear
-          cookTime = minutes;
-        }
-        break;
+        // Get context around this match
+        const start = Math.max(0, match.index - 20);
+        const end = Math.min(instruction.length, match.index + match[0].length + 20);
+        const context = instruction.slice(start, end).toLowerCase();
+        
+        timeMatches.push({time, minutes, context});
+      }
+    }
+    
+    // Process time matches and assign to prep or cook time
+    for (const match of timeMatches) {
+      const {minutes, context} = match;
+      
+      if (context.includes('prep') || context.includes('chop') || context.includes('slice') ||
+          context.includes('dice') || context.includes('mix') || context.includes('stir') ||
+          context.includes('prepare') || context.includes('cut') || context.includes('mince') ||
+          context.includes('marinate')) {
+        prepTime = minutes;
+      } else if (context.includes('bake') || context.includes('cook') || context.includes('fry') || 
+                 context.includes('grill') || context.includes('roast') || context.includes('simmer') ||
+                 context.includes('boil') || context.includes('steam') || context.includes('broil')) {
+        cookTime = minutes;
+      } else if (!prepTime && !cookTime) {
+        // If no clear context and no time assigned yet, default to cook time
+        cookTime = minutes;
       }
     }
 
@@ -974,24 +988,24 @@ export class RecipeAnalyzer {
   }
 
   static estimateCookingTimes(instructions: string[]): { prepTime: number; cookTime: number } {
-    let totalPrepTime = 0;
-    let totalCookTime = 0;
+    let minPrepTime = Infinity;
+    let minCookTime = Infinity;
     
     for (const instruction of instructions) {
       const parsed = InstructionParser.parseInstruction(instruction, 1);
-      if (parsed.prep_time) totalPrepTime += parsed.prep_time;
-      if (parsed.cook_time) totalCookTime += parsed.cook_time;
+      if (parsed.prep_time) minPrepTime = Math.min(minPrepTime, parsed.prep_time);
+      if (parsed.cook_time) minCookTime = Math.min(minCookTime, parsed.cook_time);
     }
     
     // If no times extracted, estimate based on instruction count
-    if (totalPrepTime === 0 && totalCookTime === 0) {
-      totalPrepTime = Math.max(5, instructions.length * 2);
-      totalCookTime = Math.max(10, instructions.length * 3);
+    if (minPrepTime === Infinity && minCookTime === Infinity) {
+      minPrepTime = Math.max(5, instructions.length * 2);
+      minCookTime = Math.max(10, instructions.length * 3);
     }
     
     return {
-      prepTime: totalPrepTime,
-      cookTime: totalCookTime
+      prepTime: minPrepTime === Infinity ? 0 : minPrepTime,
+      cookTime: minCookTime === Infinity ? 0 : minCookTime
     };
   }
 }

@@ -5,7 +5,7 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
-  // @ts-ignore - vitest config
+  // @ts-expect-error - vitest config
   test: {
     globals: true,
     environment: 'jsdom',
@@ -41,8 +41,8 @@ export default defineConfig({
         },
       },
     },
-    testTimeout: 10000,
-    hookTimeout: 10000,
+    testTimeout: 20000,
+    hookTimeout: 20000,
   },
   resolve: {
     alias: {

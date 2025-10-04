@@ -2,11 +2,7 @@ import { forwardRef } from 'react';
 import { useWizardStore } from '../../stores/wizardStore';
 import { PREP_DURATIONS } from '../../types/wizard';
 
-interface PrepStyleStepProps {
-  ref?: React.Ref<HTMLInputElement>;
-}
-
-export const PrepStyleStep = forwardRef<HTMLInputElement>(({ ref: _ref }, ref) => {
+export const PrepStyleStep = forwardRef<HTMLInputElement>((_props, ref) => {
   const { prepStyle, setPrepStyle } = useWizardStore();
 
   const handleSessionsChange = (sessions: number) => {
@@ -19,7 +15,7 @@ export const PrepStyleStep = forwardRef<HTMLInputElement>(({ ref: _ref }, ref) =
   const handleDurationChange = (duration: string) => {
     setPrepStyle({ 
       sessionsPerWeek: prepStyle.sessionsPerWeek, 
-      sessionDuration: duration as any 
+      sessionDuration: duration as keyof typeof PREP_DURATIONS 
     });
   };
 
@@ -69,10 +65,10 @@ export const PrepStyleStep = forwardRef<HTMLInputElement>(({ ref: _ref }, ref) =
 
       {/* Session duration */}
       <div className="space-y-4">
-        <label className="block text-lg font-semibold text-primary-500 mb-4">
+        <label id="duration-label" className="block text-lg font-semibold text-primary-500 mb-4">
           How long per session?
         </label>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-2xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-2xl mx-auto" role="radiogroup" aria-labelledby="duration-label">
           {PREP_DURATIONS.map(({ value, label }) => (
             <button
               key={value}
@@ -83,6 +79,9 @@ export const PrepStyleStep = forwardRef<HTMLInputElement>(({ ref: _ref }, ref) =
                   ? 'border-primary-500 bg-primary-50 text-primary-700'
                   : 'border-sage-200 hover:border-sage-300 text-sage-700 hover:bg-sage-50'
               }`}
+              role="radio"
+              aria-checked={prepStyle.sessionDuration === value}
+              aria-label={`${label} session duration`}
             >
               {label}
             </button>

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, user, waitFor } from '../test/utils';
-import WeeklyView, { type MealPlan, type Meal } from './WeeklyView';
+import WeeklyView, { type MealPlan } from './WeeklyView';
 import WeeklyCalendar, { type WeeklyCalendarProps } from './WeeklyCalendar';
 
 // Mock framer-motion to avoid animation issues in tests

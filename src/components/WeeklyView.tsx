@@ -75,7 +75,7 @@ export default function WeeklyView({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    loadMealPlans();
+    void loadMealPlans();
   }, []);
 
   const loadMealPlans = async () => {
@@ -85,7 +85,9 @@ export default function WeeklyView({
       // For now, we'll use the sample plan
       setCurrentPlan(samplePlan);
     } catch (error) {
-      console.error("Error loading meal plans:", error);
+      console.error('Error loading recipes:', error);
+      // In production, use proper error logging
+      // console.error("Error loading meal plans:", error);
       setCurrentPlan(samplePlan); // Show sample on error too
     }
     setIsLoading(false);
@@ -95,8 +97,9 @@ export default function WeeklyView({
     onStartNewPlan?.();
   };
 
-  const handleMealClick = (meal: Meal) => {
-    console.log("Meal clicked:", meal);
+  const handleMealClick = (_meal: Meal) => {
+    // In production, navigate to meal details or edit modal
+    // console.log("Meal clicked:", meal);
     // TODO: Navigate to meal details or edit modal
   };
 
