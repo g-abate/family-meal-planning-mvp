@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 import { expect, afterEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import * as matchers from '@testing-library/jest-dom/matchers';
+import { useWizardStore } from '../stores/wizardStore';
 
 // Extend Vitest's expect with jest-dom matchers
 expect.extend(matchers);
@@ -9,6 +10,13 @@ expect.extend(matchers);
 // Cleanup after each test case
 afterEach(() => {
   cleanup();
+  
+  // Clear localStorage to reset Zustand persisted state
+  localStorage.clear();
+  sessionStorage.clear();
+  
+  // Reset wizard store to initial state
+  useWizardStore.getState().resetWizard();
 });
 
 // Mock IntersectionObserver

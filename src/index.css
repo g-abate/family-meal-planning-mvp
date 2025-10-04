@@ -50,7 +50,17 @@
   }
 
   .btn-primary {
-    @apply bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700 shadow-soft hover:shadow-medium transform hover:-translate-y-0.5;
+    @apply bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700 shadow-soft hover:shadow-medium;
+    transform: translateY(0);
+    transition: all 0.2s ease-out, transform 0.1s ease-out;
+  }
+  
+  .btn-primary:hover {
+    transform: translateY(-1px);
+  }
+  
+  .btn-primary:active {
+    transform: translateY(0);
   }
 
   .btn-secondary {
@@ -58,19 +68,59 @@
   }
 
   .btn-accent {
-    @apply bg-orange-400 text-white hover:bg-orange-500 active:bg-orange-600 shadow-soft hover:shadow-medium transform hover:-translate-y-0.5;
+    @apply bg-orange-400 text-white hover:bg-orange-500 active:bg-orange-600 shadow-soft hover:shadow-medium;
+    transform: translateY(0);
+    transition: all 0.2s ease-out, transform 0.1s ease-out;
+  }
+  
+  .btn-accent:hover {
+    transform: translateY(-1px);
+  }
+  
+  .btn-accent:active {
+    transform: translateY(0);
   }
 
   .btn-success {
-    @apply bg-success-600 text-white hover:bg-success-700 active:bg-success-800 shadow-soft hover:shadow-medium transform hover:-translate-y-0.5;
+    @apply bg-success-600 text-white hover:bg-success-700 active:bg-success-800 shadow-soft hover:shadow-medium;
+    transform: translateY(0);
+    transition: all 0.2s ease-out, transform 0.1s ease-out;
+  }
+  
+  .btn-success:hover {
+    transform: translateY(-1px);
+  }
+  
+  .btn-success:active {
+    transform: translateY(0);
   }
 
   .btn-warning {
-    @apply bg-warning-500 text-white hover:bg-warning-600 active:bg-warning-700 shadow-soft hover:shadow-medium transform hover:-translate-y-0.5;
+    @apply bg-warning-500 text-white hover:bg-warning-600 active:bg-warning-700 shadow-soft hover:shadow-medium;
+    transform: translateY(0);
+    transition: all 0.2s ease-out, transform 0.1s ease-out;
+  }
+  
+  .btn-warning:hover {
+    transform: translateY(-1px);
+  }
+  
+  .btn-warning:active {
+    transform: translateY(0);
   }
 
   .btn-error {
-    @apply bg-error-600 text-white hover:bg-error-700 active:bg-error-800 shadow-soft hover:shadow-medium transform hover:-translate-y-0.5;
+    @apply bg-error-600 text-white hover:bg-error-700 active:bg-error-800 shadow-soft hover:shadow-medium;
+    transform: translateY(0);
+    transition: all 0.2s ease-out, transform 0.1s ease-out;
+  }
+  
+  .btn-error:hover {
+    transform: translateY(-1px);
+  }
+  
+  .btn-error:active {
+    transform: translateY(0);
   }
 
   .btn-ghost {

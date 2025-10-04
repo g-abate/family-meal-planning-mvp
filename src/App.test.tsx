@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, user } from './test/utils';
+import { render, screen, user, waitFor } from './test/utils';
 import App from './App';
 
 // Mock console methods to avoid noise in tests
@@ -82,7 +82,7 @@ describe('App', () => {
     await user.click(startButton);
 
     const modal = screen.getByRole('dialog', {
-      name: /meal planning wizard/i,
+      name: /plan your meals/i,
     });
     expect(modal).toBeInTheDocument();
   });
@@ -97,7 +97,7 @@ describe('App', () => {
     await user.click(getStartedButton);
 
     const modal = screen.getByRole('dialog', {
-      name: /meal planning wizard/i,
+      name: /plan your meals/i,
     });
     expect(modal).toBeInTheDocument();
   });
@@ -112,12 +112,12 @@ describe('App', () => {
     await user.click(startButton);
 
     const modal = screen.getByRole('dialog', {
-      name: /meal planning wizard/i,
+      name: /plan your meals/i,
     });
     expect(modal).toBeInTheDocument();
 
     const closeButton = screen.getByRole('button', {
-      name: /close/i,
+      name: /close wizard/i,
     });
 
     await user.click(closeButton);
@@ -125,7 +125,7 @@ describe('App', () => {
     expect(modal).not.toBeInTheDocument();
   });
 
-  it('closes wizard modal when continue button is clicked', async () => {
+  it('closes wizard modal when X button is clicked', async () => {
     render(<App />);
 
     const startButton = screen.getByRole('button', {
@@ -135,17 +135,169 @@ describe('App', () => {
     await user.click(startButton);
 
     const modal = screen.getByRole('dialog', {
-      name: /meal planning wizard/i,
+      name: /plan your meals/i,
     });
     expect(modal).toBeInTheDocument();
 
-    const continueButton = screen.getByRole('button', {
-      name: /continue/i,
+    const closeButton = screen.getByRole('button', {
+      name: /close wizard/i,
     });
 
-    await user.click(continueButton);
+    await user.click(closeButton);
 
     expect(modal).not.toBeInTheDocument();
+  });
+
+  it('shows weekly view after wizard completion', async () => {
+    render(<App />);
+
+    const startButton = screen.getByRole('button', {
+      name: /start planning/i,
+    });
+
+    await user.click(startButton);
+
+    const modal = screen.getByRole('dialog', {
+      name: /plan your meals/i,
+    });
+    expect(modal).toBeInTheDocument();
+
+    // Progress through all wizard steps - wizard has default valid state
+    for (let i = 0; i < 4; i++) {
+      // Wait for button to be available and enabled
+      const button = await waitFor(() => 
+        screen.getByRole('button', {
+          name: i === 3 ? /create meal plan/i : /continue/i,
+        })
+      );
+      
+      if (button && !button.hasAttribute('disabled')) {
+        await user.click(button);
+      }
+    }
+
+    // Should show weekly view
+    await waitFor(() => {
+      expect(screen.getByTestId('weekly-meal-plan-heading')).toBeInTheDocument();
+    });
+  });
+
+  it('shows weekly view with action buttons', async () => {
+    render(<App />);
+
+    const startButton = screen.getByRole('button', {
+      name: /start planning/i,
+    });
+
+    await user.click(startButton);
+
+    // Progress through all wizard steps - wizard has default valid state
+    for (let i = 0; i < 4; i++) {
+      // Wait for button to be available and enabled
+      const button = await waitFor(() => 
+        screen.getByRole('button', {
+          name: i === 3 ? /create meal plan/i : /continue/i,
+        })
+      );
+      
+      if (button && !button.hasAttribute('disabled')) {
+        await user.click(button);
+      }
+    }
+
+    // Check for weekly view action buttons
+    await waitFor(() => {
+      expect(screen.getByTestId('weekly-meal-plan-heading')).toBeInTheDocument();
+    });
+  });
+
+  it('returns to wizard when Create New Plan is clicked from weekly view', async () => {
+    render(<App />);
+
+    // Complete wizard to get to weekly view
+    const startButton = screen.getByRole('button', {
+      name: /start planning/i,
+    });
+
+    await user.click(startButton);
+
+    // Progress through all wizard steps - wizard has default valid state
+    for (let i = 0; i < 4; i++) {
+      // Wait for button to be available and enabled
+      const button = await waitFor(() => 
+        screen.getByRole('button', {
+          name: i === 3 ? /create meal plan/i : /continue/i,
+        })
+      );
+      
+      if (button && !button.hasAttribute('disabled')) {
+        await user.click(button);
+      }
+    }
+
+    // Should be in weekly view
+    await waitFor(() => {
+      expect(screen.getByTestId('weekly-meal-plan-heading')).toBeInTheDocument();
+    });
+
+    // Click Create New Plan
+    const createNewPlanButton = screen.getByRole('button', {
+      name: /create new plan/i,
+    });
+
+    await user.click(createNewPlanButton);
+
+    // Should return to wizard
+    expect(screen.getByRole('dialog', {
+      name: /plan your meals/i,
+    })).toBeInTheDocument();
+  });
+
+  it('handles prep plan button click in weekly view', async () => {
+    // Mock console.log to test prep plan functionality
+    const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+    render(<App />);
+
+    // Complete wizard to get to weekly view
+    const startButton = screen.getByRole('button', {
+      name: /start planning/i,
+    });
+
+    await user.click(startButton);
+
+    // Progress through all wizard steps - wizard has default valid state
+    for (let i = 0; i < 4; i++) {
+      // Wait for button to be available and enabled
+      const button = await waitFor(() => 
+        screen.getByRole('button', {
+          name: i === 3 ? /create meal plan/i : /continue/i,
+        })
+      );
+      
+      if (button && !button.hasAttribute('disabled')) {
+        await user.click(button);
+      }
+    }
+
+    // Wait for weekly view to load
+    await waitFor(() => {
+      expect(screen.getByTestId('weekly-meal-plan-heading')).toBeInTheDocument();
+    });
+
+    // Click See Prep Plan - this should now show MealPrepPlan component
+    const prepPlanButton = screen.getByRole('button', {
+      name: /see prep plan/i,
+    });
+
+    await user.click(prepPlanButton);
+
+    // Should show the MealPrepPlan component
+    await waitFor(() => {
+      expect(screen.getByText('Meal Prep Plan')).toBeInTheDocument();
+    });
+
+    consoleSpy.mockRestore();
   });
 
   it('has proper accessibility attributes', () => {

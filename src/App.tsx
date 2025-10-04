@@ -1,9 +1,53 @@
 import { useState } from 'react';
 import ErrorBoundary from './components/ErrorBoundary';
 import UpdatePrompt from './components/UpdatePrompt';
+import { MealPlanningWizard } from './components/MealPlanningWizard';
+import WeeklyView from './components/WeeklyView';
+import MealPrepPlan from './components/MealPrepPlan';
 
 function App() {
   const [isWizardOpen, setIsWizardOpen] = useState(false);
+  const [showWeeklyView, setShowWeeklyView] = useState(false);
+  const [showPrepPlan, setShowPrepPlan] = useState(false);
+
+  const handleWizardComplete = () => {
+    setIsWizardOpen(false);
+    setShowWeeklyView(true);
+  };
+
+  const handleStartNewPlan = () => {
+    setShowWeeklyView(false);
+    setIsWizardOpen(true);
+  };
+
+  const handleViewPrepPlan = () => {
+    setShowPrepPlan(true);
+  };
+
+  const handleBackFromPrepPlan = () => {
+    setShowPrepPlan(false);
+  };
+
+  if (showPrepPlan) {
+    return (
+      <ErrorBoundary>
+        <MealPrepPlan onBack={handleBackFromPrepPlan} />
+        <UpdatePrompt />
+      </ErrorBoundary>
+    );
+  }
+
+  if (showWeeklyView) {
+    return (
+      <ErrorBoundary>
+        <WeeklyView 
+          onStartNewPlan={handleStartNewPlan}
+          onViewPrepPlan={handleViewPrepPlan}
+        />
+        <UpdatePrompt />
+      </ErrorBoundary>
+    );
+  }
 
   return (
     <ErrorBoundary>
@@ -23,6 +67,7 @@ function App() {
               <button
                 onClick={() => setIsWizardOpen(true)}
                 className='btn btn-primary btn-md animate-fade-in'
+                tabIndex={1}
               >
                 Start Planning
               </button>
@@ -44,7 +89,8 @@ function App() {
               </p>
               <button
                 onClick={() => setIsWizardOpen(true)}
-                className='btn btn-primary btn-lg animate-float'
+                className='btn btn-primary btn-lg'
+                tabIndex={2}
               >
                 Get Started
               </button>
@@ -116,7 +162,8 @@ function App() {
                 </p>
                 <button
                   onClick={() => setIsWizardOpen(true)}
-                  className='btn btn-accent btn-lg animate-pulse-soft'
+                  className='btn btn-accent btn-lg'
+                  tabIndex={3}
                 >
                   Start Your Free Plan
                 </button>
@@ -125,50 +172,12 @@ function App() {
           </div>
         </main>
 
-        {/* Wizard Modal Placeholder */}
-        {isWizardOpen && (
-          <div className='fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in'>
-            <div
-              className='card-luxury max-w-2xl w-full animate-scale-in'
-              role='dialog'
-              aria-labelledby='wizard-title'
-              aria-describedby='wizard-description'
-            >
-              <div className='card-header'>
-                <h3
-                  id='wizard-title'
-                  className='text-2xl font-semibold text-primary-500'
-                >
-                  Meal Planning Wizard
-                </h3>
-              </div>
-              <div className='card-body'>
-                <p
-                  id='wizard-description'
-                  className='text-sage-600 mb-6 text-lg leading-relaxed'
-                >
-                  The wizard will be implemented in the next phase. For now,
-                  this is a placeholder to demonstrate the Tailwind CSS setup
-                  with our luxurious minimalism design language.
-                </p>
-                <div className='flex space-x-4'>
-                  <button
-                    onClick={() => setIsWizardOpen(false)}
-                    className='btn btn-secondary btn-md'
-                  >
-                    Close
-                  </button>
-                  <button
-                    onClick={() => setIsWizardOpen(false)}
-                    className='btn btn-primary btn-md'
-                  >
-                    Continue
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Meal Planning Wizard */}
+        <MealPlanningWizard
+          isOpen={isWizardOpen}
+          onClose={() => setIsWizardOpen(false)}
+          onComplete={handleWizardComplete}
+        />
 
         {/* PWA Update Prompt */}
         <UpdatePrompt />

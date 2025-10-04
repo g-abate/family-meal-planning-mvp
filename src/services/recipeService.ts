@@ -18,7 +18,7 @@ import { COMMON_QUERIES, performanceMonitor } from '../utils/sqliteUtils';
 class SQLiteWorkerManager {
   private worker: Worker | null = null;
   private messageId = 0;
-  private pendingMessages = new Map<string, { resolve: (value: any) => void; reject: (error: any) => void }>();
+  private pendingMessages = new Map<string, { resolve: (value: unknown) => void; reject: (error: Error) => void }>();
 
   constructor() {
     this.initializeWorker();
@@ -46,18 +46,19 @@ class SQLiteWorkerManager {
         }
       };
 
-      this.worker.onerror = (error) => {
-        console.error('SQLite Worker error:', error);
+      this.worker.onerror = () => {
+        // TODO: In production, use proper error logging service
+        // console.error('RecipeService: SQLite Worker error:', error);
         // Reject all pending messages
         for (const [, pending] of this.pendingMessages) {
-          pending.reject(error);
+          pending.reject(new Error('Worker error occurred'));
         }
         this.pendingMessages.clear();
       };
     }
   }
 
-  private async sendMessage(type: string, data?: any): Promise<any> {
+  private async sendMessage(type: string, data?: unknown): Promise<unknown> {
     return new Promise((resolve, reject) => {
       if (!this.worker) {
         reject(new Error('Worker not initialized'));
@@ -80,23 +81,23 @@ class SQLiteWorkerManager {
   }
 
   async initialize(dbData?: ArrayBuffer): Promise<DatabaseResult> {
-    return await this.sendMessage('init', { dbData });
+    return await this.sendMessage('init', { dbData }) as DatabaseResult;
   }
 
-  async execute(sql: string, params: any[] = []): Promise<DatabaseResult> {
-    return await this.sendMessage('execute', { sql, params });
+  async execute(sql: string, params: unknown[] = []): Promise<DatabaseResult> {
+    return await this.sendMessage('execute', { sql, params }) as DatabaseResult;
   }
 
-  async query<T = any>(sql: string, params: any[] = []): Promise<DatabaseResult<T[]>> {
-    return await this.sendMessage('query', { sql, params });
+  async query<T = unknown>(sql: string, params: unknown[] = []): Promise<DatabaseResult<T[]>> {
+    return await this.sendMessage('query', { sql, params }) as DatabaseResult<T[]>;
   }
 
   async search(options: SearchOptions): Promise<DatabaseResult<RecipeSearchResult[]>> {
-    return await this.sendMessage('search', { options });
+    return await this.sendMessage('search', { options }) as DatabaseResult<RecipeSearchResult[]>;
   }
 
   async close(): Promise<DatabaseResult> {
-    const result = await this.sendMessage('close');
+    const result = await this.sendMessage('close') as DatabaseResult;
     if (this.worker) {
       this.worker.terminate();
       this.worker = null;
@@ -210,7 +211,7 @@ export class RecipeService {
       const perf = performanceMonitor.end();
       performanceMonitor.logSlowQuery(perf.duration);
       
-      return { success: true, data: result.data || [] };
+      return { success: true, data: result.data ?? [] };
     } catch (error) {
       return {
         success: false,
@@ -236,7 +237,7 @@ export class RecipeService {
       const perf = performanceMonitor.end();
       performanceMonitor.logSlowQuery(perf.duration);
       
-      return { success: true, data: result.data || [] };
+      return { success: true, data: result.data ?? [] };
     } catch (error) {
       return {
         success: false,
@@ -262,7 +263,7 @@ export class RecipeService {
       const perf = performanceMonitor.end();
       performanceMonitor.logSlowQuery(perf.duration);
       
-      return { success: true, data: result.data || [] };
+      return { success: true, data: result.data ?? [] };
     } catch (error) {
       return {
         success: false,
@@ -288,7 +289,7 @@ export class RecipeService {
       const perf = performanceMonitor.end();
       performanceMonitor.logSlowQuery(perf.duration);
       
-      return { success: true, data: result.data || [] };
+      return { success: true, data: result.data ?? [] };
     } catch (error) {
       return {
         success: false,
@@ -314,7 +315,7 @@ export class RecipeService {
       const perf = performanceMonitor.end();
       performanceMonitor.logSlowQuery(perf.duration);
       
-      return { success: true, data: result.data || [] };
+      return { success: true, data: result.data ?? [] };
     } catch (error) {
       return {
         success: false,
@@ -340,7 +341,7 @@ export class RecipeService {
       const perf = performanceMonitor.end();
       performanceMonitor.logSlowQuery(perf.duration);
       
-      return { success: true, data: result.data || [] };
+      return { success: true, data: result.data ?? [] };
     } catch (error) {
       return {
         success: false,
@@ -369,7 +370,7 @@ export class RecipeService {
       const perf = performanceMonitor.end();
       performanceMonitor.logSlowQuery(perf.duration);
       
-      const ingredients = result.data?.map(item => item.ingredient_name) || [];
+      const ingredients = result.data?.map(item => item.ingredient_name) ?? [];
       return { success: true, data: ingredients };
     } catch (error) {
       return {
@@ -396,7 +397,7 @@ export class RecipeService {
       const perf = performanceMonitor.end();
       performanceMonitor.logSlowQuery(perf.duration);
       
-      const tags = result.data?.map(item => item.tag_name) || [];
+      const tags = result.data?.map(item => item.tag_name) ?? [];
       return { success: true, data: tags };
     } catch (error) {
       return {
