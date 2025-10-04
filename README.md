@@ -21,6 +21,7 @@ A modern, Progressive Web App (PWA) for family meal planning with prep optimizat
 - **Testing**: Vitest (unit) + Playwright (E2E)
 - **PWA**: Vite PWA Plugin + Workbox
 - **Code Quality**: ESLint + Prettier + Husky
+- **CI/CD**: GitHub Actions with AI PR reviews
 
 ## 📦 Project Structure
 
