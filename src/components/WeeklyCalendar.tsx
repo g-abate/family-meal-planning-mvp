@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, Users, RefreshCw, Utensils } from 'lucide-react';
 import { format, addDays, startOfWeek } from 'date-fns';

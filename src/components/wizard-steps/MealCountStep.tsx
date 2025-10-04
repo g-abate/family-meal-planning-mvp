@@ -2,7 +2,7 @@ import { forwardRef } from 'react';
 import { useWizardStore } from '../../stores/wizardStore';
 import { MEAL_TYPES } from '../../types/wizard';
 
-export const MealCountStep = forwardRef<HTMLInputElement>((props, ref) => {
+export const MealCountStep = forwardRef<HTMLInputElement>((_props, ref) => {
   const { mealCount, setMealCount } = useWizardStore();
 
   const handleMealCountChange = (delta: number) => {

@@ -1,6 +1,7 @@
 import { forwardRef } from 'react';
 import { useWizardStore } from '../../stores/wizardStore';
 import { PREP_DURATIONS } from '../../types/wizard';
+import type { PrepDuration } from '../../types/wizard';
 
 export const PrepStyleStep = forwardRef<HTMLInputElement>((_props, ref) => {
   const { prepStyle, setPrepStyle } = useWizardStore();
@@ -15,7 +16,7 @@ export const PrepStyleStep = forwardRef<HTMLInputElement>((_props, ref) => {
   const handleDurationChange = (duration: string) => {
     setPrepStyle({ 
       sessionsPerWeek: prepStyle.sessionsPerWeek, 
-      sessionDuration: duration as keyof typeof PREP_DURATIONS 
+      sessionDuration: duration as PrepDuration 
     });
   };
 

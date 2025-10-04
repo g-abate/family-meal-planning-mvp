@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, ClipboardList } from 'lucide-react';
 import { motion } from 'framer-motion';
 import WeeklyCalendar from './WeeklyCalendar';

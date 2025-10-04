@@ -1,5 +1,6 @@
 import { useWizardStore } from '../../stores/wizardStore';
 import { DIETARY_RESTRICTIONS } from '../../types/wizard';
+import type { DietaryRestriction } from '../../types/wizard';
 
 interface DietaryStepProps {
   ref?: React.Ref<HTMLInputElement>;
@@ -10,7 +11,7 @@ export function DietaryStep({ ref: _ref }: DietaryStepProps) {
 
   const handleRestrictionChange = (restriction: string) => {
     // For single selection, replace the entire array with the selected restriction
-    setDietary({ restrictions: [restriction] });
+    setDietary({ restrictions: [restriction as DietaryRestriction] });
   };
 
   const handleClearSelection = () => {
