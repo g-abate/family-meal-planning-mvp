@@ -2,6 +2,8 @@
 // Provides helper functions for database operations
 // Version: 1.0
 
+// Using any for SQL.js Database type due to import issues
+type SqlJsDatabase = any;
 import type { DatabaseResult, SearchOptions } from '../types/database';
 
 // Database initialization utilities
@@ -11,7 +13,7 @@ export const DATABASE_FILENAME = 'recipes.sqlite';
 // SQL query builders
 export class SQLQueryBuilder {
   private query: string = '';
-  private params: any[] = [];
+  private params: unknown[] = [];
 
   static select(columns: string | string[]): SQLQueryBuilder {
     const builder = new SQLQueryBuilder();
@@ -60,19 +62,19 @@ export class SQLQueryBuilder {
     return this;
   }
 
-  where(condition: string, ...params: any[]): SQLQueryBuilder {
+  where(condition: string, ...params: unknown[]): SQLQueryBuilder {
     this.query += ` WHERE ${condition}`;
     this.params.push(...params);
     return this;
   }
 
-  and(condition: string, ...params: any[]): SQLQueryBuilder {
+  and(condition: string, ...params: unknown[]): SQLQueryBuilder {
     this.query += ` AND ${condition}`;
     this.params.push(...params);
     return this;
   }
 
-  or(condition: string, ...params: any[]): SQLQueryBuilder {
+  or(condition: string, ...params: unknown[]): SQLQueryBuilder {
     this.query += ` OR ${condition}`;
     this.params.push(...params);
     return this;
@@ -93,7 +95,7 @@ export class SQLQueryBuilder {
     return this;
   }
 
-  build(): { sql: string; params: any[] } {
+  build(): { sql: string; params: unknown[] } {
     return {
       sql: this.query,
       params: this.params
@@ -150,7 +152,7 @@ export const COMMON_QUERIES = {
 };
 
 // Database validation utilities
-export function validateDatabaseSchema(db: any): DatabaseResult {
+export function validateDatabaseSchema(db: SqlJsDatabase): DatabaseResult {
   try {
     const requiredTables = [
       'recipes',
@@ -201,9 +203,9 @@ export function validateDatabaseSchema(db: any): DatabaseResult {
 }
 
 // Query optimization utilities
-export function buildSearchQuery(options: SearchOptions): { sql: string; params: any[] } {
+export function buildSearchQuery(options: SearchOptions): { sql: string; params: string[] } {
   let sql = COMMON_QUERIES.SEARCH_RECIPES_FTS;
-  const params: any[] = [options.query];
+  const params: string[] = [options.query];
 
   // Add dietary tag filters
   if (options.dietaryTags && options.dietaryTags.length > 0) {
@@ -225,17 +227,17 @@ export function buildSearchQuery(options: SearchOptions): { sql: string; params:
   // Add time filters
   if (options.maxPrepTime) {
     sql += ' AND (r.prep_time IS NULL OR r.prep_time <= ?)';
-    params.push(options.maxPrepTime);
+    params.push(options.maxPrepTime.toString());
   }
 
   if (options.maxCookTime) {
     sql += ' AND (r.cook_time IS NULL OR r.cook_time <= ?)';
-    params.push(options.maxCookTime);
+    params.push(options.maxCookTime.toString());
   }
 
   if (options.maxTotalTime) {
     sql += ' AND (r.total_time IS NULL OR r.total_time <= ?)';
-    params.push(options.maxTotalTime);
+    params.push(options.maxTotalTime.toString());
   }
 
   // Add ordering
@@ -248,11 +250,11 @@ export function buildSearchQuery(options: SearchOptions): { sql: string; params:
   // Add pagination
   if (options.limit) {
     sql += ' LIMIT ?';
-    params.push(options.limit);
+    params.push(options.limit.toString());
 
     if (options.offset) {
       sql += ' OFFSET ?';
-      params.push(options.offset);
+      params.push(options.offset.toString());
     }
   }
 
@@ -323,7 +325,7 @@ export class DatabasePerformanceMonitor {
   logSlowQuery(duration: number, threshold = 100): void {
     if (duration > threshold) {
       // eslint-disable-next-line no-console
-      console.warn(`Slow database query detected: ${this.operationName} took ${duration}ms`);
+      console.warn(`SQLiteUtils: Slow database query detected: ${this.operationName} took ${duration}ms`);
     }
   }
 }

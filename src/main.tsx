@@ -10,11 +10,11 @@ if ('serviceWorker' in navigator) {
       .register('/sw.js')
       .then(registration => {
         // eslint-disable-next-line no-console
-        console.log('SW registered: ', registration);
+        console.log('Main: Service worker registered:', registration);
       })
       .catch(registrationError => {
         // eslint-disable-next-line no-console
-        console.log('SW registration failed: ', registrationError);
+        console.log('Main: Service worker registration failed:', registrationError);
       });
   });
 }

@@ -18,7 +18,7 @@ const DIETARY_COLORS = {
   mediterranean: "bg-teal-100 text-teal-800"
 };
 
-interface WeeklyCalendarProps {
+export interface WeeklyCalendarProps {
   mealPlan: MealPlan;
   onRegeneratePlan: () => void;
   onMealClick: (meal: Meal) => void;

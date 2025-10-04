@@ -85,9 +85,9 @@ export default function WeeklyView({
       // For now, we'll use the sample plan
       setCurrentPlan(samplePlan);
     } catch (error) {
-      console.error('Error loading recipes:', error);
-      // In production, use proper error logging
-      // console.error("Error loading meal plans:", error);
+      // TODO: In production, use proper error logging service
+      // console.error('WeeklyView: Failed to load recipes:', error);
+      // console.error('WeeklyView: Failed to load meal plans:', error);
       setCurrentPlan(samplePlan); // Show sample on error too
     }
     setIsLoading(false);

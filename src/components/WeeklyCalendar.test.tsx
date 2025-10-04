@@ -21,7 +21,7 @@ vi.mock('lucide-react', () => ({
 
 // Mock date-fns
 vi.mock('date-fns', () => ({
-  format: vi.fn((date: Date, formatStr: string) => {
+  format: vi.fn((_date: Date, formatStr: string) => {
     if (formatStr === 'MMMM d, yyyy') return 'January 1, 2024';
     if (formatStr === 'MMM d') return 'Jan 1';
     return '2024-01-01';
@@ -296,6 +296,7 @@ describe('WeeklyCalendar', () => {
       <WeeklyCalendar
         mealPlan={mockMealPlan}
         onRegeneratePlan={mockOnRegeneratePlan}
+        onMealClick={mockOnMealClick}
       />
     );
 

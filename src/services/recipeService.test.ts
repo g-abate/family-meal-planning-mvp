@@ -8,8 +8,8 @@ import { RecipeService } from './recipeService';
 // Mock the SQLite worker
 const mockWorker = {
   postMessage: vi.fn(),
-  onmessage: null,
-  onerror: null,
+  onmessage: null as ((event: any) => void) | null,
+  onerror: null as ((event: any) => void) | null,
   terminate: vi.fn()
 };
 
@@ -20,7 +20,7 @@ global.Worker = vi.fn(() => mockWorker) as any;
 global.URL = vi.fn((url: string) => ({ href: url })) as any;
 
   // Mock the worker initialization to resolve immediately
-  mockWorker.postMessage.mockImplementation((message) => {
+  mockWorker.postMessage.mockImplementation((message: any) => {
     // Simulate immediate worker response
     if (mockWorker.onmessage) {
       mockWorker.onmessage({

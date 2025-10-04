@@ -26,14 +26,14 @@ describe('Database Types', () => {
         difficulty: 'easy',
         image_url: 'https://example.com/image.jpg',
         source_url: 'https://example.com/recipe',
-        created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z',
         calories_per_serving: 300,
         protein_per_serving: 20,
         carbs_per_serving: 30,
         fat_per_serving: 10,
         is_featured: false,
-        is_active: true
+        is_active: true,
+        created_at: '2024-01-01T00:00:00Z',
+        updated_at: '2024-01-01T00:00:00Z'
       };
 
       expect(recipe.id).toBe(1);
@@ -46,9 +46,12 @@ describe('Database Types', () => {
       const recipe: Recipe = {
         id: 1,
         title: 'Minimal Recipe',
+        servings: 4,
+        difficulty: 'easy',
+        is_featured: false,
+        is_active: true,
         created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z',
-        is_active: true
+        updated_at: '2024-01-01T00:00:00Z'
       };
 
       expect(recipe.prep_time).toBeUndefined();
@@ -66,10 +69,8 @@ describe('Database Types', () => {
         quantity: 2,
         unit: 'cups',
         sort_order: 1,
-        kind: 'protein',
+        kind: 'protein_main',
         is_optional: false,
-        created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z'
       };
 
       expect(ingredient.ingredient_name).toBe('chicken breast');
@@ -84,10 +85,8 @@ describe('Database Types', () => {
         recipe_id: 1,
         ingredient_name: 'salt',
         sort_order: 1,
-        kind: 'seasoning',
+        kind: 'spice',
         is_optional: false,
-        created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z'
       };
 
       expect(ingredient.quantity).toBeUndefined();
@@ -104,9 +103,7 @@ describe('Database Types', () => {
         step_number: 1,
         prep_time: 5,
         cook_time: 10,
-        temperature: 350,
-        created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z'
+        temperature: 350
       };
 
       expect(instruction.instruction).toBe('Heat oil in a large pan');
@@ -121,9 +118,7 @@ describe('Database Types', () => {
         id: 1,
         recipe_id: 1,
         instruction: 'Mix ingredients',
-        step_number: 1,
-        created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z'
+        step_number: 1
       };
 
       expect(instruction.prep_time).toBeUndefined();
@@ -138,9 +133,7 @@ describe('Database Types', () => {
         id: 1,
         recipe_id: 1,
         tag_name: 'vegetarian',
-        tag_type: 'dietary',
-        created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z'
+        tag_type: 'dietary'
       };
 
       expect(tag.tag_name).toBe('vegetarian');
@@ -159,7 +152,9 @@ describe('Database Types', () => {
         servings: 4,
         difficulty: 'easy',
         image_url: 'https://example.com/image.jpg',
-        is_featured: false
+        is_featured: false,
+        is_active: true,
+        ingredient_count: 5
       };
 
       expect(summary.title).toBe('Test Recipe');
@@ -171,31 +166,29 @@ describe('Database Types', () => {
   describe('RecipeSearchResult Interface', () => {
     it('should have all required properties', () => {
       const searchResult: RecipeSearchResult = {
-        recipes: [],
-        total: 0,
-        page: 1,
-        limit: 10,
-        hasMore: false
+        recipe_id: 1,
+        title: 'Test Recipe',
+        description: 'A test recipe',
+        ingredients: 'chicken, rice',
+        instructions: 'Cook chicken and rice',
+        tags: 'dinner, easy',
+        rank: 0.5
       };
 
-      expect(searchResult.recipes).toEqual([]);
-      expect(searchResult.total).toBe(0);
-      expect(searchResult.page).toBe(1);
-      expect(searchResult.limit).toBe(10);
-      expect(searchResult.hasMore).toBe(false);
+      expect(searchResult.recipe_id).toBe(1);
+      expect(searchResult.title).toBe('Test Recipe');
+      expect(searchResult.rank).toBe(0.5);
     });
 
-    it('should handle pagination correctly', () => {
+    it('should handle optional properties', () => {
       const searchResult: RecipeSearchResult = {
-        recipes: [],
-        total: 25,
-        page: 2,
-        limit: 10,
-        hasMore: true
+        recipe_id: 1,
+        title: 'Minimal Recipe',
+        rank: 0.8
       };
 
-      expect(searchResult.hasMore).toBe(true);
-      expect(searchResult.page).toBe(2);
+      expect(searchResult.description).toBeUndefined();
+      expect(searchResult.ingredients).toBeUndefined();
     });
   });
 
@@ -203,25 +196,26 @@ describe('Database Types', () => {
     it('should handle success result', () => {
       const successResult: DatabaseResult<string> = {
         success: true,
-        data: 'test data',
-        error: null
+        data: 'test data'
       };
 
       expect(successResult.success).toBe(true);
       expect(successResult.data).toBe('test data');
-      expect(successResult.error).toBeNull();
+      expect(successResult.error).toBeUndefined();
     });
 
     it('should handle error result', () => {
       const errorResult: DatabaseResult<string> = {
         success: false,
-        data: null,
-        error: 'Database connection failed'
+        error: {
+          code: 'CONNECTION_FAILED',
+          message: 'Database connection failed'
+        }
       };
 
       expect(errorResult.success).toBe(false);
-      expect(errorResult.data).toBeNull();
-      expect(errorResult.error).toBe('Database connection failed');
+      expect(errorResult.data).toBeUndefined();
+      expect(errorResult.error?.message).toBe('Database connection failed');
     });
   });
 
@@ -229,30 +223,24 @@ describe('Database Types', () => {
     it('should have all optional properties', () => {
       const searchOptions: SearchOptions = {
         query: 'chicken',
-        difficulty: 'easy',
+        difficulty: ['easy'],
         maxPrepTime: 30,
         maxCookTime: 60,
-        minServings: 2,
-        maxServings: 8,
-        dietaryTags: ['vegetarian'],
-        excludeIngredients: ['mushrooms'],
-        includeIngredients: ['chicken'],
-        sortBy: 'prep_time',
-        sortOrder: 'asc',
-        page: 1,
-        limit: 10
+        maxTotalTime: 90,
+        dietaryTags: ['vegetarian']
       };
 
       expect(searchOptions.query).toBe('chicken');
-      expect(searchOptions.difficulty).toBe('easy');
+      expect(searchOptions.difficulty).toEqual(['easy']);
       expect(searchOptions.dietaryTags).toEqual(['vegetarian']);
-      expect(searchOptions.sortBy).toBe('prep_time');
     });
 
     it('should allow minimal search options', () => {
-      const minimalOptions: SearchOptions = {};
+      const minimalOptions: SearchOptions = {
+        query: ''
+      };
 
-      expect(minimalOptions.query).toBeUndefined();
+      expect(minimalOptions.query).toBe('');
       expect(minimalOptions.difficulty).toBeUndefined();
     });
   });
@@ -262,12 +250,18 @@ describe('Database Types', () => {
       const recipe: Recipe = {
         id: 1,
         title: 'Test Recipe',
+        servings: 4,
+        difficulty: 'easy',
+        is_featured: false,
+        is_active: true,
         created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z',
-        is_active: true
+        updated_at: '2024-01-01T00:00:00Z'
       };
 
-      const summary: RecipeSummary = recipe;
+      const summary: RecipeSummary = {
+        ...recipe,
+        ingredient_count: 5
+      };
       expect(summary.title).toBe('Test Recipe');
     });
 
@@ -285,29 +279,24 @@ describe('Database Types', () => {
   });
 
   describe('Edge Cases', () => {
-    it('should handle null values in optional fields', () => {
+    it('should handle undefined values in optional fields', () => {
       const recipe: Recipe = {
         id: 1,
         title: 'Test Recipe',
-        prep_time: null,
-        cook_time: null,
-        total_time: null,
-        servings: null,
-        difficulty: null,
-        image_url: null,
-        source_url: null,
+        servings: 4,
+        difficulty: 'easy',
+        is_featured: false,
+        is_active: true,
         created_at: '2024-01-01T00:00:00Z',
         updated_at: '2024-01-01T00:00:00Z',
-        calories_per_serving: null,
-        protein_per_serving: null,
-        carbs_per_serving: null,
-        fat_per_serving: null,
-        is_featured: false,
-        is_active: true
+        calories_per_serving: undefined,
+        protein_per_serving: undefined,
+        carbs_per_serving: undefined,
+        fat_per_serving: undefined
       };
 
-      expect(recipe.prep_time).toBeNull();
-      expect(recipe.cook_time).toBeNull();
+      expect(recipe.prep_time).toBeUndefined();
+      expect(recipe.cook_time).toBeUndefined();
       expect(recipe.is_active).toBe(true);
     });
 
@@ -315,9 +304,12 @@ describe('Database Types', () => {
       const recipe: Recipe = {
         id: 1,
         title: '',
+        servings: 4,
+        difficulty: 'easy',
+        is_featured: false,
+        is_active: true,
         created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z',
-        is_active: true
+        updated_at: '2024-01-01T00:00:00Z'
       };
 
       expect(recipe.title).toBe('');

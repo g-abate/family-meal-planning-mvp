@@ -13,13 +13,13 @@ let SQL: any = null;
 interface WorkerMessage {
   type: 'init' | 'execute' | 'query' | 'search' | 'close';
   id: string;
-  data?: any;
+  data?: unknown;
 }
 
 interface WorkerResponse {
   type: 'success' | 'error';
   id: string;
-  data?: any;
+  data?: unknown;
   error?: string;
 }
 
@@ -56,7 +56,7 @@ async function initializeDatabase(dbData?: ArrayBuffer): Promise<DatabaseResult>
 }
 
 // Execute SQL with parameters
-function executeSQL(sql: string, _params: any[] = []): DatabaseResult {
+function executeSQL(sql: string, _params: unknown[] = []): DatabaseResult {
   try {
     if (!db) {
       throw new Error('Database not initialized');
@@ -67,7 +67,7 @@ function executeSQL(sql: string, _params: any[] = []): DatabaseResult {
       // Query executed successfully
       const columns = stmt.getColumnNames();
       const values = stmt.get();
-      const result = columns.reduce((obj: any, col: string, index: number) => {
+      const result = columns.reduce((obj: Record<string, unknown>, col: string, index: number) => {
         obj[col] = values[index];
         return obj;
       }, {});
@@ -92,7 +92,7 @@ function executeSQL(sql: string, _params: any[] = []): DatabaseResult {
 }
 
 // Query SQL with parameters and return multiple results
-function querySQL<T = any>(sql: string, _params: any[] = []): DatabaseResult<T[]> {
+function querySQL<T = unknown>(sql: string, _params: unknown[] = []): DatabaseResult<T[]> {
   try {
     if (!db) {
       throw new Error('Database not initialized');
@@ -104,7 +104,7 @@ function querySQL<T = any>(sql: string, _params: any[] = []): DatabaseResult<T[]
 
     while (stmt.step()) {
       const values = stmt.get();
-      const row = columns.reduce((obj: any, col: string, index: number) => {
+      const row = columns.reduce((obj: Record<string, unknown>, col: string, index: number) => {
         obj[col] = values[index];
         return obj;
       }, {});
@@ -153,7 +153,7 @@ function searchRecipes(options: SearchOptions): DatabaseResult {
       AND r.is_active = TRUE
     `;
 
-    const params: any[] = [options.query];
+    const params: string[] = [options.query];
 
     // Add dietary tag filters
     if (options.dietaryTags && options.dietaryTags.length > 0) {
@@ -175,17 +175,17 @@ function searchRecipes(options: SearchOptions): DatabaseResult {
     // Add time filters
     if (options.maxPrepTime) {
       sql += ' AND (r.prep_time IS NULL OR r.prep_time <= ?)';
-      params.push(options.maxPrepTime);
+      params.push(options.maxPrepTime.toString());
     }
 
     if (options.maxCookTime) {
       sql += ' AND (r.cook_time IS NULL OR r.cook_time <= ?)';
-      params.push(options.maxCookTime);
+      params.push(options.maxCookTime.toString());
     }
 
     if (options.maxTotalTime) {
       sql += ' AND (r.total_time IS NULL OR r.total_time <= ?)';
-      params.push(options.maxTotalTime);
+      params.push(options.maxTotalTime.toString());
     }
 
     // Add ordering and pagination
@@ -197,11 +197,11 @@ function searchRecipes(options: SearchOptions): DatabaseResult {
 
     if (options.limit) {
       sql += ' LIMIT ?';
-      params.push(options.limit);
+      params.push(options.limit.toString());
 
       if (options.offset) {
         sql += ' OFFSET ?';
-        params.push(options.offset);
+        params.push(options.offset.toString());
       }
     }
 
@@ -226,7 +226,8 @@ function exportDatabase(): ArrayBuffer | null {
     }
     return db.export().buffer;
   } catch (error) {
-    console.error('Failed to export database:', error);
+    // TODO: In production, use proper error logging service
+    // console.error('SQLiteWorker: Failed to export database:', error);
     return null;
   }
 }
@@ -259,7 +260,8 @@ self.onmessage = async function(e: MessageEvent<WorkerMessage>) {
   try {
     switch (type) {
       case 'init': {
-        const initResult = await initializeDatabase(data?.dbData);
+        const initData = data as { dbData?: ArrayBuffer } | undefined;
+        const initResult = await initializeDatabase(initData?.dbData);
         response = {
           type: initResult.success ? 'success' : 'error',
           id,
@@ -270,7 +272,8 @@ self.onmessage = async function(e: MessageEvent<WorkerMessage>) {
       }
 
       case 'execute': {
-        const executeResult = executeSQL(data.sql, data.params);
+        const executeData = data as { sql: string; params: unknown[] } | undefined;
+        const executeResult = executeSQL(executeData?.sql ?? '', executeData?.params ?? []);
         response = {
           type: executeResult.success ? 'success' : 'error',
           id,
@@ -281,7 +284,8 @@ self.onmessage = async function(e: MessageEvent<WorkerMessage>) {
       }
 
       case 'query': {
-        const queryResult = querySQL(data.sql, data.params);
+        const queryData = data as { sql: string; params: unknown[] } | undefined;
+        const queryResult = querySQL(queryData?.sql ?? '', queryData?.params ?? []);
         response = {
           type: queryResult.success ? 'success' : 'error',
           id,
@@ -292,7 +296,8 @@ self.onmessage = async function(e: MessageEvent<WorkerMessage>) {
       }
 
       case 'search': {
-        const searchResult = searchRecipes(data.options);
+        const searchData = data as { options: SearchOptions } | undefined;
+        const searchResult = searchRecipes(searchData?.options ?? { query: '' });
         response = {
           type: searchResult.success ? 'success' : 'error',
           id,
